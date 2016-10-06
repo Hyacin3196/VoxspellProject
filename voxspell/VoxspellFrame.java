@@ -2,7 +2,12 @@ package voxspell;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.GradientPaint;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -47,8 +52,10 @@ public class VoxspellFrame extends JFrame {
 		contentPane.setLayout(_cardLayout);
 		setContentPane(contentPane);
 		
-		contentPane.add(new MenuPanel(),"Menu");
+		contentPane.add(new MenuPanel(this),"Menu");
 		_cardLayout.show(contentPane, "Menu");
+		
+		
 	}
 
 }
