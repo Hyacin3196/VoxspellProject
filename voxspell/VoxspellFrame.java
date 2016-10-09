@@ -19,6 +19,10 @@ public class VoxspellFrame extends JFrame {
 	private JPanel contentPane;
 	
 	private CardLayout _cardLayout;
+	
+	MenuPanel menu = new MenuPanel(this, _cardLayout, contentPane);
+	PreSpellingQuizPanel preSpellingQuiz = new PreSpellingQuizPanel(this, _cardLayout, contentPane);
+	SpellingQuizPanel spellingQuiz = new SpellingQuizPanel(this, _cardLayout, contentPane);
 
 	/**
 	 * Launch the application.
@@ -51,8 +55,13 @@ public class VoxspellFrame extends JFrame {
 		_cardLayout = new CardLayout();
 		contentPane.setLayout(_cardLayout);
 		setContentPane(contentPane);
-		
-		contentPane.add(new MenuPanel(this),"Menu");
+
+		menu = new MenuPanel(this, _cardLayout, contentPane);
+		preSpellingQuiz = new PreSpellingQuizPanel(this, _cardLayout, contentPane);
+		spellingQuiz = new SpellingQuizPanel(this, _cardLayout, contentPane);
+		contentPane.add(menu,"Menu");
+		contentPane.add(preSpellingQuiz,"PreSpellingQuiz");
+		contentPane.add(spellingQuiz,"SpellingQuiz");
 		_cardLayout.show(contentPane, "Menu");
 		
 		
