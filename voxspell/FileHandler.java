@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 
 /**
  * This is a class with static methods which
@@ -54,9 +57,9 @@ public class FileHandler {
 
 			Scanner optionScanner = new Scanner(optionFile);
 
-			optionScanner.next();
 			options.add(optionScanner.next());
-			optionScanner.next();
+			options.add(optionScanner.next());
+			options.add(optionScanner.next());
 			options.add(optionScanner.next());
 
 			optionScanner.close();
@@ -77,8 +80,8 @@ public class FileHandler {
 				optionFile.createNewFile();
 			}
 			PrintWriter fileWriter = new PrintWriter(optionFile);
-			fileWriter.println("Voice: kal_diphone");
-			fileWriter.println("Video_Play_Settings: always_ask");
+			fileWriter.println("kal_diphone 100 1.0");
+			fileWriter.println("always_ask");
 			fileWriter.flush();
 			fileWriter.close();
 			BashCommand.setVoiceOptions("kal_diphone");
@@ -93,15 +96,15 @@ public class FileHandler {
 	 * @param voiceOps
 	 * @param videoOps
 	 */
-	public static void setOptions(String voiceOps, String videoOps){
+	public static void setOptions(String voiceOps, int voiceSp, double voiceVol, String videoOps){
 		try {
 			File optionFile = new File(optionFileName);
 			if(!optionFile.exists()){
 				optionFile.createNewFile();
 			}
 			PrintWriter fileWriter = new PrintWriter(optionFile);
-			fileWriter.println("Voice: "+voiceOps);
-			fileWriter.println("Video_Play_Settings: "+videoOps);
+			fileWriter.println(voiceOps+" "+voiceSp+" "+voiceVol);
+			fileWriter.println(videoOps);
 			fileWriter.flush();
 			fileWriter.close();
 			BashCommand.setVoiceOptions(voiceOps);
@@ -110,4 +113,6 @@ public class FileHandler {
 			e.printStackTrace();
 		}
 	}
+	
+	
 }

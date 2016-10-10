@@ -75,6 +75,31 @@ public class BashCommand {
 			}
 			PrintWriter writer = new PrintWriter(speechFile);
 			writer.println("(voice_"+currentVoice+")");
+			writer.println("(Parameter.set 'Audio_Command \"aplay -q -c 1 -t raw -f s16 -r $(($SR*100/100)) $FILE\")");
+			writer.println("(set! after_synth_hooks (list (lambda (utt) (utt.wave.rescale utt 1.0 t))))");
+			writer.println("(SayText \""+speech+"\")");
+			writer.print("(quit)");
+			writer.flush();
+			writer.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		bashCommand("festival -b .speech.scm");
+	}
+	
+	public static void sayFestival(String speech, int speechSpeed, double speechVol){
+		try {
+			String speechFileName = ".speech.scm";
+			File speechFile = new File(speechFileName);
+			if(!speechFile.exists()){
+				speechFile.createNewFile();
+			}
+			PrintWriter writer = new PrintWriter(speechFile);
+			writer.println("(voice_"+currentVoice+")");
+			writer.println("(Parameter.set 'Audio_Command \"aplay -q -c 1 -t raw -f s16 -r $(($SR*"+speechSpeed+"/100)) $FILE\")");
+			writer.println("(set! after_synth_hooks (list (lambda (utt) (utt.wave.rescale utt "+speechVol+" t))))");
+
 			writer.println("(SayText \""+speech+"\")");
 			writer.print("(quit)");
 			writer.flush();

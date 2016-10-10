@@ -59,7 +59,7 @@ public class MenuPanel extends JPanel {
 		_cardLayout = cLayout;
 		_cardPanel = cardPanel;
 
-		setSize(800,600);
+		setSize(650,500);
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
 		separator = new JSeparator();
@@ -80,8 +80,17 @@ public class MenuPanel extends JPanel {
 		btnSpellingQuiz = createAndAddButton("Spelling Quiz");
 		addCardChangeListener(btnSpellingQuiz,"PreSpellingQuiz");
 		btnUserStats = createAndAddButton("User Statistics");
+		addCardChangeListener(btnUserStats,"ViewStats");
 		btnOptions = createAndAddButton("Options");
+		addCardChangeListener(btnOptions,"Menu");
 		btnExit = createAndAddButton("Exit");
+		btnExit.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				SoundHandler.playSound("pop.wav");
+				System.exit(0);
+			}
+		});
 
 
 		separator_2 = new JSeparator();
@@ -129,6 +138,7 @@ public class MenuPanel extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				_cardLayout.show(_cardPanel, cardName);
+				SoundHandler.playSound("pop.wav");
 			}
 		});
 	}
@@ -142,10 +152,10 @@ public class MenuPanel extends JPanel {
 		g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 		int w = getWidth();
 		int h = getHeight();
-		Color color1 = new Color(	0,	0,	255,127);
-		Color color2 = new Color(	0,	255,255,127);
+		Color color1 = new Color(	0,	0,	255,96);
+		Color color2 = new Color(	0,	255,255,96);
 		GradientPaint primary = new GradientPaint(0, 0, color1, w, 0, color2);
-		GradientPaint shade = new GradientPaint(0f, 0f, new Color(0, 0, 0, 0),0f, h, new Color(0, 0, 0, 225));
+		GradientPaint shade = new GradientPaint(0f, 0f, new Color(0, 0, 0, 0),0f, h, new Color(0, 0, 0, 96));
 		g2d.setPaint(primary);
 		g2d.fillRect(0, 0, w, h);
 		g2d.setPaint(shade);
