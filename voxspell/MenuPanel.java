@@ -26,6 +26,8 @@ import java.awt.image.BufferStrategy;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 
+import handler.SoundHandler;
+
 import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
@@ -159,18 +161,7 @@ public class MenuPanel extends JPanel {
 		g2d.setPaint(primary);
 		g2d.fillRect(0, 0, w, h);
 		g2d.setPaint(shade);
-		g2d.fillRect(0, 0, w, h);
-		PointerInfo a = MouseInfo.getPointerInfo();
-		Point point = a.getLocation();
-		double x = point.getX()-this.getX()-_originFrame.getX();
-		double y = point.getY()-this.getY()-_originFrame.getY();
-		Point2D point2D = new Point2D.Double(x,y);
-		int radius = 750;
-		float[] dist = {0,1};
-		Color[] colors = {new Color(127,127,255,64),new Color(0,0,0,0)};
-		RadialGradientPaint radial = new RadialGradientPaint(point2D,radius,dist,colors);
-		g2d.setPaint(radial);
-		g2d.fillRect(0, 0, w, h);
+		g2d.fillRect(0, 0, w, h);	
 	}
 }
 

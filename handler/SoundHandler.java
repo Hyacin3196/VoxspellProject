@@ -1,4 +1,4 @@
-package voxspell;
+package handler;
 
 import java.io.File;
 

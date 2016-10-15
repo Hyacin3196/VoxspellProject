@@ -10,8 +10,11 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
+import handler.SoundHandler;
 
 @SuppressWarnings("serial")
 public class VoxspellFrame extends JFrame {
@@ -45,7 +48,7 @@ public class VoxspellFrame extends JFrame {
 	 * Create the frame.
 	 */
 	public VoxspellFrame() {
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		setBounds(200, 100, 650, 500);
 		//setSize(800,600);
 		setResizable(false);
@@ -68,7 +71,22 @@ public class VoxspellFrame extends JFrame {
 		contentPane.add(viewStats,"ViewStats");
 		_cardLayout.show(contentPane, "Menu");
 		
+
+		SoundHandler.playSound("boot.wav");
 		
+		this.addWindowListener(new java.awt.event.WindowAdapter() {
+		    @Override
+		    public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+		    	SoundHandler.playSound("boot.wav");
+		        if (JOptionPane.showConfirmDialog(VoxspellFrame.this, 
+		            "Are you sure to close this window?", "Really Closing?", 
+		            JOptionPane.YES_NO_OPTION,
+		            JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
+		        	System.exit(0);
+		        }else{
+		        }
+		    }
+		});
 	}
 
 }

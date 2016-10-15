@@ -13,6 +13,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
+import handler.SoundHandler;
+import handler.StatisticsHandler;
+
 /*
  * This class is used to visually update and display
  * the statistics of the words attempted

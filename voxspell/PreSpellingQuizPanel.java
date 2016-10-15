@@ -5,6 +5,10 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.Hashtable;
 
 import javax.swing.Box;
@@ -13,6 +17,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -21,8 +26,15 @@ import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import javax.swing.JSlider;
 import javax.swing.SwingConstants;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
+
+import handler.BashCommand;
+import handler.SoundHandler;
+
 import javax.swing.JTextField;
 import javax.swing.JSeparator;
+import javax.swing.JTextArea;
 
 public class PreSpellingQuizPanel extends JPanel {
 	private VoxspellFrame _originFrame;
@@ -32,14 +44,15 @@ public class PreSpellingQuizPanel extends JPanel {
 	private JLabel lblNumberOfWords;
 	private JLabel lblChooseTheme;
 	private JLabel lblVoice;
-	private JComboBox comboBox_1;
+	private JComboBox voiceComboBox;
 	private JLabel lblVoiceVolume;
 	private JLabel lblVoiceSpeed;
 	private JButton btnContinue;
 	private JButton btnBack;
-	private JSlider sliderTestNumber;
+	private JSlider sliderQuizSize;
 	private JSlider sliderVolume;
 	private JSlider sliderSpeed;
+	private JTextField quizSizeTextField;
 
 	//private Quiz quiz;
 
@@ -58,9 +71,9 @@ public class PreSpellingQuizPanel extends JPanel {
 		add(panel);
 		GridBagLayout gbl_panel = new GridBagLayout();
 		gbl_panel.columnWidths = new int[]{0, 133, 279, 0, 62, 0};
-		gbl_panel.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 21, 0};
-		gbl_panel.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
-		gbl_panel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_panel.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 21, 0};
+		gbl_panel.columnWeights = new double[]{0.0, 0.0, 0.0, 1.0, 1.0, Double.MIN_VALUE};
+		gbl_panel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
 		panel.setLayout(gbl_panel);
 
 		JLabel lblChooseSpellingList = new JLabel("Choose Spelling List:");
@@ -93,22 +106,70 @@ public class PreSpellingQuizPanel extends JPanel {
 		gbc_lblNumberOfWords.gridy = 2;
 		panel.add(lblNumberOfWords, gbc_lblNumberOfWords);
 		
-		sliderTestNumber = new JSlider();
-		sliderTestNumber.setPreferredSize(new Dimension(400,50));
-		sliderTestNumber.setOpaque(false);
-		sliderTestNumber.setMajorTickSpacing(95);
-		sliderTestNumber.setMinorTickSpacing(5);
-		sliderTestNumber.setMinimum(5);
-		sliderTestNumber.setValue(10);
-		sliderTestNumber.setPaintTicks(true);
-		sliderTestNumber.setPaintLabels(true);
-		sliderTestNumber.setLabelTable(sliderTestNumber.createStandardLabels(95));
+		sliderQuizSize = new JSlider();
+		sliderQuizSize.setPreferredSize(new Dimension(200,50));
+		sliderQuizSize.setOpaque(false);
+		sliderQuizSize.setMajorTickSpacing(95);
+		sliderQuizSize.setMinorTickSpacing(5);
+		sliderQuizSize.setMinimum(5);
+		sliderQuizSize.setValue(10);
+		sliderQuizSize.setPaintTicks(true);
+		sliderQuizSize.setPaintLabels(true);
+		sliderQuizSize.setLabelTable(sliderQuizSize.createStandardLabels(95));
 		GridBagConstraints gbc_sliderTests = new GridBagConstraints();
-		gbc_sliderTests.gridwidth = 2;
 		gbc_sliderTests.insets = new Insets(0, 0, 5, 5);
 		gbc_sliderTests.gridx = 2;
 		gbc_sliderTests.gridy = 2;
-		panel.add(sliderTestNumber, gbc_sliderTests);
+		panel.add(sliderQuizSize, gbc_sliderTests);
+		sliderQuizSize.addChangeListener(new ChangeListener(){
+			//update quizSizeTextField when slider changes
+			public void stateChanged(ChangeEvent arg0) {
+				quizSizeTextField.setText(""+sliderQuizSize.getValue());
+			}
+		});
+		
+		quizSizeTextField = new JTextField();
+		quizSizeTextField.setText(""+sliderQuizSize.getValue());
+		GridBagConstraints gbc_textField = new GridBagConstraints();
+		gbc_textField.insets = new Insets(0, 0, 5, 5);
+		gbc_textField.fill = GridBagConstraints.HORIZONTAL;
+		gbc_textField.gridx = 3;
+		gbc_textField.gridy = 2;
+		panel.add(quizSizeTextField, gbc_textField);
+		quizSizeTextField.setColumns(10);
+		quizSizeTextField.addKeyListener(new KeyAdapter() {
+			// Only allows numeric characters to be typed
+			public void keyTyped(KeyEvent e) {
+				char c = e.getKeyChar();
+				if(!Character.isDigit(c)){
+					e.consume();
+				}
+				int quizSize = Integer.parseInt(quizSizeTextField.getText());
+				if(quizSize<5){
+					sliderQuizSize.setValue(5);
+				}else if(quizSize>100){
+					sliderQuizSize.setValue(100);
+				}else{
+					sliderQuizSize.setValue(quizSize);
+				}
+			}
+		});
+		quizSizeTextField.addFocusListener(new FocusListener(){
+			public void focusGained(FocusEvent arg0) {
+				//do nothing
+			}
+
+			@Override
+			public void focusLost(FocusEvent arg0) {
+				int size = Integer.parseInt(quizSizeTextField.getText());
+				if(size<5){
+					quizSizeTextField.setText("5");
+				}else if(size>100){
+					quizSizeTextField.setText("100");
+				}
+			}
+			
+		});
 
 		lblChooseTheme = new JLabel("               Choose Theme:");
 		lblChooseTheme.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -130,14 +191,14 @@ public class PreSpellingQuizPanel extends JPanel {
 		panel.add(lblVoice, gbc_lblVoice);
 		
 		String[] voiceList = BashCommand.bashReturnCommand("ls /usr/share/festival/voices/english").toArray(new String[0]);
-		comboBox_1 = new JComboBox(voiceList);
+		voiceComboBox = new JComboBox(voiceList);
 		GridBagConstraints gbc_comboBox_1 = new GridBagConstraints();
 		gbc_comboBox_1.gridwidth = 2;
 		gbc_comboBox_1.insets = new Insets(0, 0, 5, 5);
 		gbc_comboBox_1.fill = GridBagConstraints.HORIZONTAL;
 		gbc_comboBox_1.gridx = 2;
 		gbc_comboBox_1.gridy = 4;
-		panel.add(comboBox_1, gbc_comboBox_1);
+		panel.add(voiceComboBox, gbc_comboBox_1);
 
 		lblVoiceVolume = new JLabel("Voice Volume:");
 		lblVoiceVolume.setFont(new Font("Comic Sans MS", Font.BOLD, 12));
@@ -175,25 +236,34 @@ public class PreSpellingQuizPanel extends JPanel {
 		gbc_sliderSpeed.gridy = 6;
 		panel.add(sliderSpeed, gbc_sliderSpeed);
 
+		/**
+		 * sets the required options in the SpellingQuiz and then initiates the Quiz
+		 */
 		btnContinue = new JButton("Continue");
 		btnContinue.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
-				_cardLayout.show(_cardPanel, "SpellingQuiz");
 				_originFrame.spellingQuiz.setWordList((String)comboBox.getSelectedItem());
-				_originFrame.spellingQuiz.setListSize(sliderTestNumber.getValue());
+				_originFrame.spellingQuiz.setListSize(sliderQuizSize.getValue());
 				_originFrame.spellingQuiz.startQuiz();
+				
+				BashCommand.setVoice((String)voiceComboBox.getSelectedItem());
 
+				int x = Integer.parseInt(quizSizeTextField.getText());
+				if(x<5||x>100){
+					JOptionPane.showMessageDialog(PreSpellingQuizPanel.this, "Invalid quiz number!", "Error", JOptionPane.ERROR_MESSAGE);
+				}else{
+					_cardLayout.show(_cardPanel, "SpellingQuiz");
+				}
 				SoundHandler.playSound("pop.wav");
 			}
 		});
 		GridBagConstraints gbc_btnContinue = new GridBagConstraints();
 		gbc_btnContinue.insets = new Insets(0, 0, 0, 5);
 		gbc_btnContinue.gridx = 3;
-		gbc_btnContinue.gridy = 9;
+		gbc_btnContinue.gridy = 8;
 		panel.add(btnContinue, gbc_btnContinue);
 		
 		
-
 		btnBack = new JButton("Back");
 		btnBack.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
@@ -204,7 +274,7 @@ public class PreSpellingQuizPanel extends JPanel {
 		});
 		GridBagConstraints gbc_btnBack = new GridBagConstraints();
 		gbc_btnBack.gridx = 4;
-		gbc_btnBack.gridy = 9;
+		gbc_btnBack.gridy = 8;
 		panel.add(btnBack, gbc_btnBack);
 		_originFrame = origin;
 		_cardLayout = cardLayout;

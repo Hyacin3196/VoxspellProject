@@ -1,4 +1,4 @@
-package voxspell;
+package handler;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -60,13 +60,18 @@ public class FileHandler {
 			options.add(optionScanner.next());
 			options.add(optionScanner.next());
 			options.add(optionScanner.next());
-			options.add(optionScanner.next());
 
 			optionScanner.close();
 		} catch (IOException e) {
 
 			e.printStackTrace();
 		}
+		/**
+		 * sets the options in the BashCommand from the optionFile
+		 */
+		BashCommand.setVoice(options.get(0));
+		BashCommand.setVoiceSpeed(Integer.parseInt(options.get(1)));
+		BashCommand.setVoiceVolume(Double.parseDouble(options.get(2)));
 		return options;
 	}
 
@@ -74,6 +79,9 @@ public class FileHandler {
 	 * sets default options for VOXSPELL, can also be used to create a new option file
 	 */
 	public static void setDefaultOptions(){
+		BashCommand.setVoice("kal_diphone");
+		BashCommand.setVoiceSpeed(100);
+		BashCommand.setVoiceVolume(1.0);
 		try {
 			File optionFile = new File(optionFileName);
 			if(!optionFile.exists()){
@@ -81,10 +89,9 @@ public class FileHandler {
 			}
 			PrintWriter fileWriter = new PrintWriter(optionFile);
 			fileWriter.println("kal_diphone 100 1.0");
-			fileWriter.println("always_ask");
 			fileWriter.flush();
 			fileWriter.close();
-			BashCommand.setVoiceOptions("kal_diphone");
+			BashCommand.setVoice("kal_diphone");
 		} catch (IOException e) {
 
 			e.printStackTrace();
@@ -92,11 +99,11 @@ public class FileHandler {
 	}
 	
 	/**
-	 * sets the chosen options in an options file
+	 * saves the chosen options in an options file when the system exits
 	 * @param voiceOps
 	 * @param videoOps
 	 */
-	public static void setOptions(String voiceOps, int voiceSp, double voiceVol, String videoOps){
+	public static void saveOptions(String voiceOps, int voiceSp, double voiceVol){
 		try {
 			File optionFile = new File(optionFileName);
 			if(!optionFile.exists()){
@@ -104,10 +111,9 @@ public class FileHandler {
 			}
 			PrintWriter fileWriter = new PrintWriter(optionFile);
 			fileWriter.println(voiceOps+" "+voiceSp+" "+voiceVol);
-			fileWriter.println(videoOps);
 			fileWriter.flush();
 			fileWriter.close();
-			BashCommand.setVoiceOptions(voiceOps);
+			BashCommand.setVoice(voiceOps);
 		} catch (IOException e) {
 
 			e.printStackTrace();

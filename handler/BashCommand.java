@@ -1,4 +1,4 @@
-package voxspell;
+package handler;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -13,19 +13,44 @@ import java.util.List;
 public class BashCommand {
 	static Process currentProcess;
 
-	private static String currentVoice = "kal_diphone";
+	private static String _voice = "kal_diphone";
+	private static int _voiceSpeed = 100;
+	private static double _voiceVolume = 1.0;
 
 	
 	static {
 		List<String> listOption = FileHandler.getOptions();
-		currentVoice = listOption.get(0);
+		_voice = listOption.get(0);
 	}
 	
-	public static void setVoiceOptions(String voice){
-		currentVoice = voice;
+	public static void setVoice(String voice){
+		_voice = voice;
+	}
+	public static void setVoiceSpeed(int speed){
+		_voiceSpeed = speed;
+	}
+	public static void setVoiceVolume(double volume){
+		_voiceVolume = volume;
+	}
+	public static void setDefault(){
+		_voice = "kal_diphone";
+		_voiceSpeed = 100;
+		_voiceVolume = 1.0;
+
+	}
+	
+	public static int getVoiceSpeed(){
+		return _voiceSpeed;
+	}
+	public static double getVoiceVolume(){
+		return _voiceVolume;
 	}
 
-	//Allows users to use bash commands
+	
+	/**
+	 * Allows users to use bash commands
+	 * @param command
+	 */
 	public static void bashCommand(String command){
 		try {
 			ProcessBuilder pb = new ProcessBuilder("bash","-c",command);
@@ -38,7 +63,11 @@ public class BashCommand {
 		}
 	}
 
-	//Allows users to use bash commands that return an output
+	/**
+	 * Allows users to use bash commands that return an output
+	 * @param command
+	 * @return
+	 */
 	public static List<String> bashReturnCommand(String command){
 		List<String> resultLines = new ArrayList<String>();
 		try {
@@ -60,12 +89,19 @@ public class BashCommand {
 		return resultLines;
 	}
 
-	//A bash command that converts text to speech using festival
+	/**
+	 * A bash command that converts text to speech using festival
+	 * @param speech
+	 */
 	public static void say(String speech){
 		bashCommand("echo \""+speech+"\" | festival --tts");
 	}
 
 
+	/**
+	 * 
+	 * @param speech
+	 */
 	public static void sayFestival(String speech){
 		try {
 			String speechFileName = ".speech.scm";
@@ -74,9 +110,9 @@ public class BashCommand {
 				speechFile.createNewFile();
 			}
 			PrintWriter writer = new PrintWriter(speechFile);
-			writer.println("(voice_"+currentVoice+")");
-			writer.println("(Parameter.set 'Audio_Command \"aplay -q -c 1 -t raw -f s16 -r $(($SR*100/100)) $FILE\")");
-			writer.println("(set! after_synth_hooks (list (lambda (utt) (utt.wave.rescale utt 1.0 t))))");
+			writer.println("(voice_"+_voice+")");
+			writer.println("(Parameter.set 'Audio_Command \"aplay -q -c 1 -t raw -f s16 -r $(($SR*"+_voiceSpeed+"/100)) $FILE\")");
+			writer.println("(set! after_synth_hooks (list (lambda (utt) (utt.wave.rescale utt "+_voiceVolume+" t))))");
 			writer.println("(SayText \""+speech+"\")");
 			writer.print("(quit)");
 			writer.flush();
@@ -96,7 +132,7 @@ public class BashCommand {
 				speechFile.createNewFile();
 			}
 			PrintWriter writer = new PrintWriter(speechFile);
-			writer.println("(voice_"+currentVoice+")");
+			writer.println("(voice_"+_voice+")");
 			writer.println("(Parameter.set 'Audio_Command \"aplay -q -c 1 -t raw -f s16 -r $(($SR*"+speechSpeed+"/100)) $FILE\")");
 			writer.println("(set! after_synth_hooks (list (lambda (utt) (utt.wave.rescale utt "+speechVol+" t))))");
 
