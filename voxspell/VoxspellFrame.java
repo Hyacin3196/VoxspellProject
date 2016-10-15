@@ -83,7 +83,6 @@ public class VoxspellFrame extends JFrame {
 		            JOptionPane.YES_NO_OPTION,
 		            JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
 		        	System.exit(0);
-		        }else{
 		        }
 		    }
 		});

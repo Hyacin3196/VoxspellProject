@@ -3,6 +3,7 @@ package voxspell;
 import javax.swing.JPanel;
 import java.awt.GridBagLayout;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -30,6 +31,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.swing.JSlider;
+import javax.swing.JTable;
+
 import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
@@ -38,6 +41,7 @@ import java.awt.Graphics2D;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.text.DefaultCaret;
 
 import handler.BashCommand;
 import handler.FileHandler;
@@ -57,12 +61,14 @@ public class SpellingQuizPanel extends JPanel {
 	private int listSize = 10;
 	private List<String> inputList = new ArrayList<String>();
 	private String word;
+	private String userAnswer;
 	private boolean _isCorrect = false;
 	private boolean _firstTry = false;
 	private boolean _wordDone = false;
 	private boolean _quizDone = false;
 	private boolean _answered = false;
 	private int _wordsDone = 0;
+	private int _wordsCorrect = 0;
 	private int i = 0;
 
 
@@ -79,8 +85,11 @@ public class SpellingQuizPanel extends JPanel {
 	private JLabel lblvoiceSetting;
 	private JSeparator separator_1;
 	private JScrollPane scrollPane;
+	private FeedbackTableModel fbModel;
+	private JTable fbTable;
 	private JPanel tryPanel;
 	private JLabel lblProgress;
+	private JSeparator separator;
 	/**
 	 * Create the panel.
 	 */
@@ -92,9 +101,9 @@ public class SpellingQuizPanel extends JPanel {
 		setSize(650,500);
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{46, 27, 93, 81, 75, 71, 53, 0, 0};
-		gridBagLayout.rowHeights = new int[]{0, 0, 119, 34, 32, 111, 0, 38, 42, 0, 0};
+		gridBagLayout.rowHeights = new int[]{31, 119, 34, 32, 111, 0, 38, 42, 0, 0};
 		gridBagLayout.columnWeights = new double[]{0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-		gridBagLayout.rowWeights = new double[]{0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
+		gridBagLayout.rowWeights = new double[]{0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
 		setLayout(gridBagLayout);
 
 		textField = new JTextField();
@@ -132,42 +141,70 @@ public class SpellingQuizPanel extends JPanel {
 		textField.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
 				if(speaker.isDone()){
-					String input = textField.getText();
+					userAnswer = textField.getText();
 
 					// Only check if input is not empty
-					if (!input.trim().equalsIgnoreCase("")) {
-						inputList.add(0,input);
+					if (!userAnswer.trim().equalsIgnoreCase("")) {
+						inputList.add(0,userAnswer);
 						while(inputList.size()>5){
 							inputList.remove(inputList.size()-1);
 						}
 						_answered = true;
 						textField.setText("");
 						tryPanel.repaint();
-						checkIfCorrect(input);
+						checkIfCorrect(userAnswer);
 					}
 				}
 			}
 		});
 
-		scrollPane = new JScrollPane();
+
+
+		String[] columnNames = new String[]{"Result","Correct Answer","Your Answer"};
+		fbModel = new FeedbackTableModel(columnNames);
+
+		fbTable = new JTable(fbModel);
+		fbTable.setAutoCreateRowSorter(true);
+		fbTable.changeSelection(0, 0, false, false);
+
+		scrollPane = new JScrollPane(fbTable);
+		//scrollPane.setOpaque(false);
+		scrollPane.setVisible(true);
+		
+		separator = new JSeparator();
+		GridBagConstraints gbc_separator = new GridBagConstraints();
+		gbc_separator.gridwidth = 8;
+		gbc_separator.insets = new Insets(0, 0, 5, 5);
+		gbc_separator.gridx = 0;
+		gbc_separator.gridy = 0;
+		add(separator, gbc_separator);
 		GridBagConstraints gbc_scrollPane = new GridBagConstraints();
-		gbc_scrollPane.gridheight = 2;
 		gbc_scrollPane.gridwidth = 4;
+		gbc_scrollPane.gridheight = 2;
 		gbc_scrollPane.insets = new Insets(0, 0, 5, 5);
 		gbc_scrollPane.fill = GridBagConstraints.BOTH;
 		gbc_scrollPane.gridx = 2;
-		gbc_scrollPane.gridy = 2;
+		gbc_scrollPane.gridy = 1;
 		add(scrollPane, gbc_scrollPane);
-		
+
+		/*
+		GridBagConstraints gbc_fbPanel = new GridBagConstraints();
+		gbc_fbPanel.gridheight = 2;
+		gbc_fbPanel.gridwidth = 4;
+		gbc_fbPanel.insets = new Insets(0, 0, 5, 5);
+		gbc_fbPanel.fill = GridBagConstraints.BOTH;
+		gbc_fbPanel.gridx = 2;
+		gbc_fbPanel.gridy = 2;
+		add(fbPanel, gbc_fbPanel);*/
+
 		lblProgress = new JLabel("");
 		GridBagConstraints gbc_lblProgress = new GridBagConstraints();
 		gbc_lblProgress.insets = new Insets(0, 0, 5, 5);
 		gbc_lblProgress.gridx = 6;
-		gbc_lblProgress.gridy = 3;
+		gbc_lblProgress.gridy = 2;
 		add(lblProgress, gbc_lblProgress);
 
 		tryPanel = new JPanel(){
-
 			public void paintComponent(Graphics g){
 				Graphics2D g2d = (Graphics2D) g;
 				g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
@@ -199,14 +236,14 @@ public class SpellingQuizPanel extends JPanel {
 		gbc_panel.insets = new Insets(0, 0, 5, 5);
 		gbc_panel.fill = GridBagConstraints.BOTH;
 		gbc_panel.gridx = 1;
-		gbc_panel.gridy = 4;
+		gbc_panel.gridy = 3;
 		add(tryPanel, gbc_panel);
 		GridBagConstraints gbc_textField = new GridBagConstraints();
 		gbc_textField.gridwidth = 4;
 		gbc_textField.insets = new Insets(0, 0, 5, 5);
 		gbc_textField.fill = GridBagConstraints.HORIZONTAL;
 		gbc_textField.gridx = 2;
-		gbc_textField.gridy = 4;
+		gbc_textField.gridy = 3;
 		add(textField, gbc_textField);
 		textField.setColumns(10);
 
@@ -222,7 +259,7 @@ public class SpellingQuizPanel extends JPanel {
 		GridBagConstraints gbc_btnRepeat = new GridBagConstraints();
 		gbc_btnRepeat.insets = new Insets(0, 0, 5, 5);
 		gbc_btnRepeat.gridx = 6;
-		gbc_btnRepeat.gridy = 4;
+		gbc_btnRepeat.gridy = 3;
 		add(btnRepeat, gbc_btnRepeat);
 
 		btnNextWord = new JButton("Next Word");
@@ -248,7 +285,7 @@ public class SpellingQuizPanel extends JPanel {
 		GridBagConstraints gbc_lblvoiceSetting = new GridBagConstraints();
 		gbc_lblvoiceSetting.insets = new Insets(0, 0, 5, 5);
 		gbc_lblvoiceSetting.gridx = 2;
-		gbc_lblvoiceSetting.gridy = 5;
+		gbc_lblvoiceSetting.gridy = 4;
 		add(lblvoiceSetting, gbc_lblvoiceSetting);
 
 		sliderVoiceVolume = new JSlider(JSlider.VERTICAL);
@@ -265,7 +302,7 @@ public class SpellingQuizPanel extends JPanel {
 		gbc_sliderVoiceVolume.fill = GridBagConstraints.HORIZONTAL;
 		gbc_sliderVoiceVolume.insets = new Insets(0, 0, 5, 5);
 		gbc_sliderVoiceVolume.gridx = 3;
-		gbc_sliderVoiceVolume.gridy = 5;
+		gbc_sliderVoiceVolume.gridy = 4;
 		add(sliderVoiceVolume, gbc_sliderVoiceVolume);
 		sliderVoiceVolume.addChangeListener(new ChangeListener() {
 			@Override
@@ -290,7 +327,7 @@ public class SpellingQuizPanel extends JPanel {
 		GridBagConstraints gbc_sliderVoiceSpeed = new GridBagConstraints();
 		gbc_sliderVoiceSpeed.insets = new Insets(0, 0, 5, 5);
 		gbc_sliderVoiceSpeed.gridx = 4;
-		gbc_sliderVoiceSpeed.gridy = 5;
+		gbc_sliderVoiceSpeed.gridy = 4;
 		add(sliderVoiceSpeed, gbc_sliderVoiceSpeed);
 		sliderVoiceSpeed.addChangeListener(new ChangeListener() {
 			@Override
@@ -306,30 +343,30 @@ public class SpellingQuizPanel extends JPanel {
 		gbc_lblVoiceVolume.fill = GridBagConstraints.HORIZONTAL;
 		gbc_lblVoiceVolume.insets = new Insets(0, 0, 5, 5);
 		gbc_lblVoiceVolume.gridx = 3;
-		gbc_lblVoiceVolume.gridy = 6;
+		gbc_lblVoiceVolume.gridy = 5;
 		add(lblVoiceVolume, gbc_lblVoiceVolume);
 
 		lblVoiceSpeed = new JLabel("<html><center>Voice<br> Speed</center></html>");
 		GridBagConstraints gbc_lblVoiceSpeed = new GridBagConstraints();
 		gbc_lblVoiceSpeed.insets = new Insets(0, 0, 5, 5);
 		gbc_lblVoiceSpeed.gridx = 4;
-		gbc_lblVoiceSpeed.gridy = 6;
+		gbc_lblVoiceSpeed.gridy = 5;
 		add(lblVoiceSpeed, gbc_lblVoiceSpeed);
 		GridBagConstraints gbc_btnNextWord = new GridBagConstraints();
 		gbc_btnNextWord.gridwidth = 5;
 		gbc_btnNextWord.insets = new Insets(0, 0, 5, 5);
 		gbc_btnNextWord.gridx = 2;
-		gbc_btnNextWord.gridy = 7;
+		gbc_btnNextWord.gridy = 6;
 		add(btnNextWord, gbc_btnNextWord);
 
 		separator_1 = new JSeparator();
 		GridBagConstraints gbc_separator_1 = new GridBagConstraints();
 		gbc_separator_1.insets = new Insets(0, 0, 5, 0);
 		gbc_separator_1.gridx = 7;
-		gbc_separator_1.gridy = 7;
+		gbc_separator_1.gridy = 6;
 		add(separator_1, gbc_separator_1);
 
-		btnBack = new JButton("Back");
+		/*btnBack = new JButton("Back");
 		btnBack.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
 				_cardLayout.show(_cardPanel, "PreSpellingQuiz");
@@ -339,8 +376,8 @@ public class SpellingQuizPanel extends JPanel {
 		GridBagConstraints gbc_btnBack = new GridBagConstraints();
 		gbc_btnBack.insets = new Insets(0, 0, 0, 5);
 		gbc_btnBack.gridx = 6;
-		gbc_btnBack.gridy = 9;
-		add(btnBack, gbc_btnBack);
+		gbc_btnBack.gridy = 8;
+		add(btnBack, gbc_btnBack);*/
 
 		btnExit = new JButton("Exit");
 		btnExit.addActionListener(new ActionListener(){
@@ -351,7 +388,7 @@ public class SpellingQuizPanel extends JPanel {
 		});
 		GridBagConstraints gbc_btnExit = new GridBagConstraints();
 		gbc_btnExit.gridx = 7;
-		gbc_btnExit.gridy = 9;
+		gbc_btnExit.gridy = 8;
 		add(btnExit, gbc_btnExit);
 	}
 
@@ -370,9 +407,10 @@ public class SpellingQuizPanel extends JPanel {
 			listSize = wordList.size();
 		}
 		word = wordList.get(0);
-		
+
 		//start progress
 		_wordsDone = 0;
+		_wordsCorrect = 0;
 		lblProgress.setText(_wordsDone+"/"+listSize);
 
 		//initialise state identifiers
@@ -381,10 +419,13 @@ public class SpellingQuizPanel extends JPanel {
 		_wordDone = false;
 		_quizDone = false;
 		_answered = false;
+		
+		//reset result table
+		String[] columnNames = new String[]{"Result","Correct Answer","Your Answer"};
+		fbModel = new FeedbackTableModel(columnNames);
+		fbTable.setModel(fbModel);
 
-		/**
-		 * reset sliders
-		 */
+		//reset sliders
 		sliderVoiceSpeed.setValue(100);
 		sliderVoiceVolume.setValue(10);
 
@@ -396,28 +437,34 @@ public class SpellingQuizPanel extends JPanel {
 		tryPanel.repaint();
 		System.out.println(wordList);
 
-		
+
 	}
 
 	public void checkIfCorrect(String input){
-		if(input.equalsIgnoreCase(word)){
-			_isCorrect = true;
-			_wordDone = true;
-			btnNextWord.setEnabled(true);
-			btnNextWord.requestFocus();
-			SoundHandler.playSound("correct.wav");
-		}else if(!input.equalsIgnoreCase(word)&&_firstTry){
-			_isCorrect = false;
-			_firstTry = false;
-			SoundHandler.playSound("wrong.wav");
-		}else if(!input.equalsIgnoreCase(word)&&!_firstTry){
-			_isCorrect = false;
-			_wordDone = true;
-			btnNextWord.setEnabled(true);
-			btnNextWord.requestFocus();
-			SoundHandler.playSound("wrong.wav");
+		if(!_wordDone){
+			if(input.equalsIgnoreCase(word)){
+				_isCorrect = true;
+				_wordDone = true;
+				_wordsCorrect++;
+				btnNextWord.setEnabled(true);
+				btnNextWord.requestFocus();
+				fbModel.addWord(true,word,userAnswer);
+				SoundHandler.playSound("correct.wav");
+			}else if(!input.equalsIgnoreCase(word)&&_firstTry){
+				_isCorrect = false;
+				_firstTry = false;
+				SoundHandler.playSound("wrong.wav");
+			}else if(!input.equalsIgnoreCase(word)&&!_firstTry){
+				_isCorrect = false;
+				_wordDone = true;
+				btnNextWord.setEnabled(true);
+				btnNextWord.requestFocus();
+				fbModel.addWord(false,word,userAnswer);
+				SoundHandler.playSound("wrong.wav");
+			}
+			tryPanel.repaint();
+			fbTable.changeSelection(fbTable.getRowCount() - 1, 0, false, false);
 		}
-		tryPanel.repaint();
 	}
 
 	/**
@@ -430,6 +477,11 @@ public class SpellingQuizPanel extends JPanel {
 			System.out.println(wordList);
 			if(wordList.size()<=0){
 				_quizDone = true;
+
+				QuizFinishFrame qfFrame = new QuizFinishFrame(_originFrame, "<html><center>You finished the quiz<br>"
+						+ "You scored "+_wordsCorrect+"/"+listSize+"</center><html>");
+				qfFrame.setVisible(true);
+				_originFrame.setEnabled(false);
 			}else{
 				word = wordList.get(0);
 
