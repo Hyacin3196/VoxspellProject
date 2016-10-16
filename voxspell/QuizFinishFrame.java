@@ -1,6 +1,7 @@
 package voxspell;
 
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -24,17 +25,21 @@ import java.awt.Font;
 
 public class QuizFinishFrame extends JFrame {
 
+	private CardLayout _cardLayout;
+	private JPanel _cardPanel;
 	private JPanel contentPane;
 	private JFrame _origin;
 
 	/**
 	 * Create the frame.
 	 */
-	public QuizFinishFrame(JFrame origin, String congratulatory) {
+	public QuizFinishFrame(VoxspellFrame origin,CardLayout cardLayout, JPanel cards, String congratulatory) {
 		_origin = origin;
+		_cardLayout = cardLayout;
+		_cardPanel = cards;
 		
 		this.setTitle("Quiz Finished!");
-		setBounds(100, 100, 300, 200);
+		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -63,13 +68,22 @@ public class QuizFinishFrame extends JFrame {
 		gbc_btnRedoQuiz.gridy = 5;
 		contentPane.add(btnRedoQuiz, gbc_btnRedoQuiz);
 		
-		JButton btnPlayVideo = new JButton("Play Video");
+		JButton btnPlayVideo = new JButton("Play Video Reward");
 		btnPlayVideo.setFont(new Font("Comic Sans MS", Font.BOLD, 10));
 		GridBagConstraints gbc_btnPlayVideo = new GridBagConstraints();
 		gbc_btnPlayVideo.insets = new Insets(0, 0, 5, 5);
 		gbc_btnPlayVideo.gridx = 1;
 		gbc_btnPlayVideo.gridy = 5;
 		contentPane.add(btnPlayVideo, gbc_btnPlayVideo);
+		btnPlayVideo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				QuizFinishFrame.this.dispatchEvent(new WindowEvent(QuizFinishFrame.this, WindowEvent.WINDOW_CLOSING));
+				_origin.setEnabled(true);
+				_cardLayout.show(_cardPanel, "Menu");
+				new VideoReward();
+				SoundHandler.playSound("pop.wav");
+			}
+		});
 		
 		JButton btnMenu = new JButton("Menu");
 		btnMenu.setFont(new Font("Comic Sans MS", Font.BOLD, 10));
@@ -82,6 +96,7 @@ public class QuizFinishFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				QuizFinishFrame.this.dispatchEvent(new WindowEvent(QuizFinishFrame.this, WindowEvent.WINDOW_CLOSING));
 				_origin.setEnabled(true);
+				_cardLayout.show(_cardPanel, "Menu");
 
 				SoundHandler.playSound("pop.wav");
 			}
@@ -93,5 +108,4 @@ public class QuizFinishFrame extends JFrame {
 			}
 		});
 	}
-
 }

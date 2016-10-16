@@ -37,7 +37,7 @@ public class ViewStatistics extends JPanel{
 		_cardPanel=cards;
 		setLayout(new BorderLayout());
 		
-		String[] headers = { "Level", "Word", "Mastered", "Faulted", "Failed" };
+		String[] headers = { "Spelling List", "Word", "Accuracy" };
 		String[][] rowData = StatisticsHandler.getWordStatisticsAsArray();
 		
 		// Creates JTable and makes it so users can't edit cells
@@ -94,7 +94,7 @@ public class ViewStatistics extends JPanel{
 	 * This method updates the JTable with the updated statistics
 	 */
 	public void update() {
-		String[] headers = { "Level", "Word", "Mastered", "Faulted", "Failed" };
+		String[] headers = { "Spelling List", "Word", "Accuracy" };
 		String[][] rowData = StatisticsHandler.getWordStatisticsAsArray();
 		
 		DefaultTableModel model = new DefaultTableModel(rowData, headers);

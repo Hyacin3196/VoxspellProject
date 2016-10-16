@@ -13,7 +13,7 @@ import java.util.List;
 public class BashCommand {
 	static Process currentProcess;
 
-	private static String _voice = "kal_diphone";
+	private static String _voice = "akl_nz_jdt_diphone";
 	private static int _voiceSpeed = 100;
 	private static double _voiceVolume = 1.0;
 
@@ -39,6 +39,9 @@ public class BashCommand {
 
 	}
 	
+	public static String getVoice(){
+		return _voice;
+	}
 	public static int getVoiceSpeed(){
 		return _voiceSpeed;
 	}

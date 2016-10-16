@@ -1,5 +1,6 @@
 package handler;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,44 +19,21 @@ import javax.swing.JOptionPane;
  */
 public class StatisticsHandler {
 	public static final int MASTERED = 0;
-	public static final int FAILED = 1;
+	public static final int ATTEMPTS = 1;
 
 	/**
 	 * Each hashmap in the wordStatistics represents the statistics from each spelling list
 	 */
 	private static HashMap<String,HashMap<String, List<Integer>>> wordStatistics;
-
-	// This contains the count of correct spellings and count of total attempts.
-	// This will be used to get accuracy statistics for level.
-	private static List<List<Integer>> accuracy;
+	
+	public static HashMap<String,HashMap<String, List<Integer>>> getStats(){
+		return wordStatistics;
+	}
+	
+	
 
 	static {
-		wordStatistics = new HashMap<String,HashMap<String, List<Integer>>>();
-		accuracy = new ArrayList<List<Integer>>();
-		int temp = 0;
-
-		/*try {
-			temp = FileHandler.getTotalLevels();
-
-		} catch (FileNotFoundException e) {
-			//JOptionPane.showMessageDialog(null, "Warning! Spelling list file not found");
-		}*/
-
-		/*TOTAL_LEVELS = temp;
-
-		for (int i = 0; i < temp; i++) {
-			wordStatistics.add(new HashMap<String, List<Integer>>());
-
-			List<Integer> counts = new ArrayList<Integer>(2);
-			counts.add(0, 0);
-			counts.add(1, 0);
-			accuracy.add(counts);
-
-		}*/
-
-
-
-
+		wordStatistics = FileHandler.getStatisticsOfAllFiles();
 	}
 
 	/**
@@ -76,7 +54,7 @@ public class StatisticsHandler {
 		if (!statsFromSpellList.containsKey(word)) {
 			resultsCount = new ArrayList<Integer>(2);
 			resultsCount.add(MASTERED, 0);
-			resultsCount.add(FAILED, 0);
+			resultsCount.add(ATTEMPTS, 0);
 
 			statsFromSpellList.put(word, resultsCount);
 		}
@@ -86,79 +64,18 @@ public class StatisticsHandler {
 			int updatedCount = resultsCount.get(MASTERED) + 1;
 			resultsCount.remove(MASTERED);
 			resultsCount.add(MASTERED, updatedCount);
+			updatedCount = resultsCount.get(MASTERED) + 1;
+			resultsCount.remove(ATTEMPTS);
+			resultsCount.add(ATTEMPTS, updatedCount);
 		}else{
 
-			int updatedCount = resultsCount.get(FAILED) + 1;
-			resultsCount.remove(FAILED);
-			resultsCount.add(FAILED, updatedCount);
+			int updatedCount = resultsCount.get(ATTEMPTS) + 1;
+			resultsCount.remove(ATTEMPTS);
+			resultsCount.add(ATTEMPTS, updatedCount);
 		}
 	}
 
-	// method for adding/removing failed words
-
-	/*
-	 * This method updates the mastered/faulted/failed count for that word
-	 * as well as the accuracy rate for the level.
-	 */
-	/*public static void updateStatistics(String spellList, String word, int result) {
-		HashMap<String, List<Integer>> wordsFromLevel;
-		//List<Integer> accuracyFromLevel = accuracy.get(level - 1);
-
-		// Gets the statistics of the words from the specified level
-		if (wordStatistics.get(level - 1) == null) {
-			wordsFromLevel = new HashMap<String, List<Integer>>();		
-		} 
-		else {
-			wordsFromLevel = wordStatistics.get(level - 1);
-		}
-
-		List<Integer> resultsCount;
-
-		// If the word is not in the hashmap
-		if (!wordsFromLevel.containsKey(word)) {
-			resultsCount = new ArrayList<Integer>(3);
-			resultsCount.add(MASTERED, 0);
-			resultsCount.add(FAULTED, 0);
-			resultsCount.add(FAILED, 0);
-
-			wordsFromLevel.put(word, resultsCount);
-
-		}
-
-		// Get counts and update appropriately
-		resultsCount = wordsFromLevel.get(word);
-		int updatedCount = resultsCount.get(result) + 1;
-		resultsCount.remove(result);
-		resultsCount.add(result, updatedCount);
-
-
-		// This updates the total correct for the level
-		if(result == MASTERED) {
-			int totalCorrect = accuracyFromLevel.get(0) + 1;
-			accuracyFromLevel.remove(0);
-			accuracyFromLevel.add(0, totalCorrect);
-		}
-
-		// Updates the total attempts for the level
-		int totalAttempts = accuracyFromLevel.get(1) + 1;
-		accuracyFromLevel.remove(1);
-		accuracyFromLevel.add(1, totalAttempts);
-
-	}*/
-
-	/*
-	 * This method is used to retrieve the accuracy rate for a specified level
-	 */
-	public static int getAccuracy(int level) {
-		List<Integer> accuracyFromLevel = accuracy.get(level - 1);
-		int totalCorrect = accuracyFromLevel.get(0);
-		int totalAttempts = accuracyFromLevel.get(1);
-
-		// Get accuracy in % and round to an integer.
-		return (int) Math.round(((double) totalCorrect / totalAttempts) * 100);
-	}
-
-	/*
+	/**
 	 * This method is used to retrieve word statistics in a 2D array
 	 * so that it may be used in a JTable
 	 */
@@ -180,7 +97,7 @@ public class StatisticsHandler {
 
 				// Convert results counts to String
 				String mastered = Integer.toString(resultsCount.get(MASTERED));
-				String failed = Integer.toString(resultsCount.get(FAILED));
+				String failed = Integer.toString(resultsCount.get(ATTEMPTS));
 
 				// Create String array of stats and add to list
 				String[] statsForCurrentWord = { Integer.toString(level), word, mastered, failed };
@@ -200,21 +117,9 @@ public class StatisticsHandler {
 		return statsArray;
 
 	}
-
-	/*
-	 * This method clears all the word statistics
-	 */
-	/*public static void clearStats() {
-		for(HashMap<String, List<Integer>> level : wordStatistics) {
-			level.clear();
-		}
-		for(List<Integer> accuracyForLevel : accuracy) {
-			accuracyForLevel.clear();
-			accuracyForLevel.add(0, 0);
-			accuracyForLevel.add(1, 0);
-
-		}
-		failedWords.clear();
-	}*/
+	
+	public static void saveStats(){
+		FileHandler.saveStats(wordStatistics);
+	}
 
 }

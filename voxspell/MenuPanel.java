@@ -83,6 +83,12 @@ public class MenuPanel extends JPanel {
 		addCardChangeListener(btnSpellingQuiz,"PreSpellingQuiz");
 		btnUserStats = createAndAddButton("User Statistics");
 		addCardChangeListener(btnUserStats,"ViewStats");
+		btnUserStats.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				_originFrame.viewStats.update();
+			}
+		});
 		btnOptions = createAndAddButton("Options");
 		addCardChangeListener(btnOptions,"Menu");
 		btnExit = createAndAddButton("Exit");
