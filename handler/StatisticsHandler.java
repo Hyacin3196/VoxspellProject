@@ -8,7 +8,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.table.DefaultTableModel;
+
+import voxspell.AccuracyBar;
+import voxspell.Percentage;
 
 /*
  * This class will contain arrays which holds the statistics
@@ -26,18 +32,21 @@ public class StatisticsHandler {
 	 */
 	private static HashMap<String,HashMap<String, List<Integer>>> wordStatistics;
 	
+	/**
+	 * a getter for wordStatistics
+	 * @return
+	 */
 	public static HashMap<String,HashMap<String, List<Integer>>> getStats(){
 		return wordStatistics;
 	}
 	
 	
-
 	static {
 		wordStatistics = FileHandler.getStatisticsOfAllFiles();
 	}
 
 	/**
-	 * 
+	 * Updates the wordStatistics field whenever user answers the quiz
 	 * @param spellList: name of the spelling list in the spelling_lists folder
 	 * @param word: name of the word
 	 * @param mastered: if mastered
@@ -64,7 +73,7 @@ public class StatisticsHandler {
 			int updatedCount = resultsCount.get(MASTERED) + 1;
 			resultsCount.remove(MASTERED);
 			resultsCount.add(MASTERED, updatedCount);
-			updatedCount = resultsCount.get(MASTERED) + 1;
+			updatedCount = resultsCount.get(ATTEMPTS) + 1;
 			resultsCount.remove(ATTEMPTS);
 			resultsCount.add(ATTEMPTS, updatedCount);
 		}else{
@@ -73,53 +82,72 @@ public class StatisticsHandler {
 			resultsCount.remove(ATTEMPTS);
 			resultsCount.add(ATTEMPTS, updatedCount);
 		}
+		System.out.println(word+" "+resultsCount);
+		
+		wordStatistics.remove(spellList);
+		wordStatistics.put(spellList, statsFromSpellList);
 	}
 
 	/**
 	 * This method is used to retrieve word statistics in a 2D array
 	 * so that it may be used in a JTable
 	 */
-	public static String[][] getWordStatisticsAsArray() {
-		List<List<String>> statsList = new ArrayList<List<String>>();
+	public static DefaultTableModel getWordStatisticsAsTableModel() {
+		List<Object[]> statsList = new ArrayList<Object[]>();
 
-		// Loop through all levels
-		for (int i = 0; i < wordStatistics.size(); i++) {
-			int level = i + 1;
-
-			// Get words for that level
-			HashMap<String, List<Integer>> wordMap = wordStatistics.get(i);		
-			List<String> wordList = new ArrayList<String>(wordMap.keySet());
-			Collections.sort(wordList, String.CASE_INSENSITIVE_ORDER);
-
-			// Loop through words for that level
-			for (String word : wordList) {
-				List<Integer> resultsCount = wordMap.get(word);
-
-				// Convert results counts to String
-				String mastered = Integer.toString(resultsCount.get(MASTERED));
-				String failed = Integer.toString(resultsCount.get(ATTEMPTS));
-
-				// Create String array of stats and add to list
-				String[] statsForCurrentWord = { Integer.toString(level), word, mastered, failed };
-				statsList.add(Arrays.asList(statsForCurrentWord));			
+		wordStatistics.forEach((spellingFileName, listStats) -> {
+			listStats.forEach((word,result) -> {
+				Object[] statsRow = new Object[4];
+				
+				statsRow[0] = spellingFileName;
+				statsRow[1] = word;
+				
+				int masteryNum = result.get(0);
+				int attemptNum = result.get(1);
+				double accuracy = ((double)masteryNum)/((double)attemptNum);
+				//String percentStr = ""+(Math.round(accuracy*10000.0)/100.0)+"%";\
+				Percentage percent = new Percentage(accuracy);
+				
+				AccuracyBar accuracyBar = new AccuracyBar(accuracy);
+				
+				statsRow[2] = accuracyBar.convertToImageIcon();
+				statsRow[3] = percent;
+				
+				statsList.add(statsRow);
+			});
+		});
+		
+		DefaultTableModel tableModel = new DefaultTableModel(){
+			@Override
+			public Class getColumnClass(int column)
+			{
+				if (column == 2) return ImageIcon.class; 
+				if (column == 3) return Percentage.class; 
+				return String.class;
 			}
-		}
-
-		// Converting the list to a 2D array
-		String[][] statsArray = new String[statsList.size()][5];
-		int i = 0;
-
-		for(List<String> statsForCurrentWord : statsList) {
-			statsArray[i] = (String[]) statsForCurrentWord.toArray();
-			i++;
-		}
-
-		return statsArray;
-
+		};
+		tableModel.setColumnIdentifiers(new String[]{"SpellingList", "Word", "Accuracy", ""});
+		
+		statsList.forEach((row) -> {
+			tableModel.addRow(row);
+		});
+		
+		return tableModel;
 	}
 	
+	/**
+	 * Saves statistics in a stats folder
+	 */
 	public static void saveStats(){
 		FileHandler.saveStats(wordStatistics);
+	}
+	
+	/**
+	 * remove all files in the statistics folder and reset the wordStatistics field
+	 */
+	public static void clearStats(){
+		wordStatistics = new HashMap<String,HashMap<String, List<Integer>>>();
+		FileHandler.clearStats();
 	}
 
 }

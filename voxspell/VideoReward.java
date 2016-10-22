@@ -8,6 +8,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -31,7 +32,7 @@ import com.sun.jna.NativeLibrary;
 public class VideoReward extends JFrame{
 	
 	private JPanel framePanel, buttonPanel;
-	private JButton playAndPause, stop, mute;
+	private JButton playAndPause, stop, mute, exit;
     private final EmbeddedMediaPlayerComponent mediaPlayerComponent;
     private final EmbeddedMediaPlayer video;
     private final String videoFile = "big_buck_bunny_1_minute.avi";
@@ -123,12 +124,26 @@ public class VideoReward extends JFrame{
 			
 		});
         
+        // Set up mute button
+        exit = generateButton();
+        exit.setText("Exit");
+        exit.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {		
+
+				VideoReward.this.dispatchEvent(new WindowEvent(VideoReward.this, WindowEvent.WINDOW_CLOSING));
+			}
+			
+		});
+        
         // Add buttons to panel
         buttonPanel.add(playAndPause);
         buttonPanel.add(Box.createRigidArea(new Dimension(5,0)));
         buttonPanel.add(stop);
         buttonPanel.add(Box.createRigidArea(new Dimension(5,0)));
         buttonPanel.add(mute);
+        buttonPanel.add(Box.createRigidArea(new Dimension(5,0)));
+        buttonPanel.add(exit);
         
         // Add components to main frame panel
         framePanel.add(mediaPlayerComponent);

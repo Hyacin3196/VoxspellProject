@@ -19,54 +19,22 @@ import javax.swing.table.DefaultTableModel;
 import handler.ImageHandler;
 
 public class FeedbackTableModel extends DefaultTableModel{
-
+	
+	
+	/**
+	 * FeedBack Model Contructor
+	 * @param columnNames
+	 */
 	public FeedbackTableModel(String[] columnNames){
 		super(null,columnNames);
 	}
-
-
-	public boolean isCellEditable(int row, int column){
-		return false;
-	}
-
-	/*public void addWord(String word, final boolean isCorrect){
-		JPanel panel = new JPanel();
-		panel.setOpaque(false);
-		panel.setLayout(new BoxLayout(panel,BoxLayout.X_AXIS));
-
-		JLabel label = new JLabel(word);
-		label.setOpaque(false);
-		label.setSize(new Dimension(100,100));
-
-		JPanel icon = new JPanel(){
-			public void paintComponent(Graphics g){
-				super.paintComponent(g);
-				Graphics2D g2d = (Graphics2D) g;
-				g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-				int w = getWidth();
-				int h = getHeight();
-				String imageFile = "";
-				if(isCorrect){
-					imageFile = "icons/check.ico";
-				}else{
-					imageFile = "icons/error.ico";
-				}
-				try{
-					BufferedImage image = ImageHandler.getImage(imageFile);
-					g2d.drawImage(image, w, h, null);
-				}catch(IOException e){
-					JOptionPane.showMessageDialog(null, "Image "+imageFile+"not found","No Image", JOptionPane.ERROR_MESSAGE);
-				}
-			}
-		};
-		icon.setOpaque(false);
-
-		panel.add(icon);
-		panel.add(label);
-
-		this.add(panel);
-
-	}*/
+	
+	/**
+	 * adds word to the feedback table and shows if user failed to answer correctly or not
+	 * @param isCorrect
+	 * @param word
+	 * @param answer
+	 */
 	public void addWord(boolean isCorrect,String word, String answer){
 		ImageIcon icon;
 		if(isCorrect){
@@ -75,12 +43,23 @@ public class FeedbackTableModel extends DefaultTableModel{
 			icon = new ImageIcon("icons/error-7.png");
 		}
 		this.addRow(new Object[]{icon,word,answer});
+		
 	}
 
+	/**
+	 * makes sure that the image icons show properly
+	 */
 	@Override
 	public Class getColumnClass(int column)
 	{
 		if (column == 0) return ImageIcon.class; 
 		return Object.class;
+	}
+	
+	/**
+	 * disables cell editing
+	 */
+	public boolean isCellEditable(int row, int column){
+		return false;
 	}
 }

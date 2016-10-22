@@ -17,6 +17,7 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
 import javax.swing.JOptionPane;
 
+
 /**
  * This is a class with static methods which
  * will be used to handle anything related to files
@@ -81,7 +82,7 @@ public class FileHandler {
 	 * sets default options for VOXSPELL, can also be used to create a new option file
 	 */
 	public static void setDefaultOptions(){
-		BashCommand.setVoice("kal_diphone");
+		BashCommand.setVoice("akl_nz_jdt_diphone");
 		BashCommand.setVoiceSpeed(100);
 		BashCommand.setVoiceVolume(1.0);
 		try {
@@ -90,10 +91,10 @@ public class FileHandler {
 				optionFile.createNewFile();
 			}
 			PrintWriter fileWriter = new PrintWriter(optionFile);
-			fileWriter.println("kal_diphone 100 1.0");
+			fileWriter.println("akl_nz_jdt_diphone 100 1.0");
 			fileWriter.flush();
 			fileWriter.close();
-			BashCommand.setVoice("kal_diphone");
+			BashCommand.setVoice("akl_nz_jdt_diphone");
 		} catch (IOException e) {
 
 			e.printStackTrace();
@@ -143,25 +144,25 @@ public class FileHandler {
 				if(!statFile.exists()){
 					statFile.createNewFile();
 				}
-				
+
 				Scanner fileScanner = new Scanner(statFile);
-				
+
 				while(fileScanner.hasNextLine()){
 					String line = fileScanner.nextLine();
 					Scanner lineScanner = new Scanner(line);
-					
+
 					String word = lineScanner.next();
 					int mastered = Integer.parseInt(lineScanner.next());
 					int attempts = Integer.parseInt(lineScanner.next());
-					
+
 					List<Integer> result = new ArrayList<Integer>();
 					result.add(mastered);
 					result.add(attempts);
-					
+
 					listStats.put(word, result);
-					
+
 				}
-				
+
 				wordStats.put(fileName, listStats);	
 			}
 		}catch(IOException e){
@@ -194,10 +195,16 @@ public class FileHandler {
 			}
 		});
 	}
-
+	
 	/**
-	 * VoiceList Section
+	 * removes all stats files
 	 */
+	public static void clearStats(){
+		File dir = new File("stats");
+		for(File file: dir.listFiles())
+			if (!file.isDirectory()) 
+				file.delete();
+	}
 
 	/**
 	 * Gets the list of files in the folder directory

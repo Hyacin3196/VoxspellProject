@@ -2,10 +2,13 @@ package voxspell;
 
 import javax.swing.JPanel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 
 import java.awt.GridBagLayout;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
 import java.awt.GridBagConstraints;
 import javax.swing.JSeparator;
 import java.awt.Insets;
@@ -26,7 +29,10 @@ import java.awt.image.BufferStrategy;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 
-import handler.SoundHandler;
+import handler.BashCommand;
+import handler.StatisticsHandler;
+import worker.SoundWorker;
+import worker.SpeechWorker;
 
 import java.awt.Font;
 import java.awt.GradientPaint;
@@ -51,16 +57,21 @@ public class MenuPanel extends JPanel {
 	private JLabel welcomeText;
 
 	private JSeparator separator, separator_1, separator_2;
-
+	
+	private JComboBox themeChanger;
+	
 	private JButton btnSpellingQuiz, btnUserStats, btnOptions, btnExit;
+	
+	
 	/**
 	 * Create the panel.
 	 */
+	@SuppressWarnings("unchecked")
 	public MenuPanel(VoxspellFrame origin, CardLayout cLayout, JPanel cardPanel) {
 		_originFrame = origin;
 		_cardLayout = cLayout;
 		_cardPanel = cardPanel;
-
+		
 		setSize(650,500);
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
@@ -76,27 +87,53 @@ public class MenuPanel extends JPanel {
 
 
 		separator_1 = new JSeparator();
-		separator_1.setMaximumSize(new Dimension(0,150));
+		separator_1.setMaximumSize(new Dimension(0,100));
 		add(separator_1);
+		
+		
+		themeChanger = new JComboBox(_originFrame.getThemeListAsPreview());
+		themeChanger.setMaximumSize(new Dimension(100,30));
+		themeChanger.setOpaque(false);
+		themeChanger.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent e) {
+				_originFrame.setTheme(((ThemePreview)themeChanger.getSelectedItem()).getTheme());
+				_originFrame.repaintAllComponents();
+			}
+		});
+		add(themeChanger);
 
 		btnSpellingQuiz = createAndAddButton("Spelling Quiz");
 		addCardChangeListener(btnSpellingQuiz,"PreSpellingQuiz");
+		btnSpellingQuiz.addActionListener(new ActionListener(){
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				_originFrame._preSpellingQuiz.startPreQuiz();
+			}
+		});
+		
 		btnUserStats = createAndAddButton("User Statistics");
 		addCardChangeListener(btnUserStats,"ViewStats");
 		btnUserStats.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				_originFrame.viewStats.update();
+				_originFrame._viewStats.update();
 			}
 		});
-		btnOptions = createAndAddButton("Options");
-		addCardChangeListener(btnOptions,"Menu");
+		
 		btnExit = createAndAddButton("Exit");
 		btnExit.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				SoundHandler.playSound("pop.wav");
-				System.exit(0);
+				SoundWorker.playSound("boot.wav");
+
+				if (JOptionPane.showConfirmDialog(MenuPanel.this, 
+						"Are you sure to close this window?", "Really Closing?", 
+						JOptionPane.YES_NO_OPTION,
+						JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
+					StatisticsHandler.saveStats();
+					BashCommand.saveOptions();
+					System.exit(0);
+				}
 			}
 		});
 
@@ -137,7 +174,7 @@ public class MenuPanel extends JPanel {
 		add(button);
 		return button;
 	}
-	
+
 	/**
 	 * Adds a function to a button to change screens when pressed
 	 */
@@ -146,7 +183,7 @@ public class MenuPanel extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				_cardLayout.show(_cardPanel, cardName);
-				SoundHandler.playSound("pop.wav");
+				SoundWorker.playSound("pop.wav");
 			}
 		});
 	}
@@ -160,8 +197,8 @@ public class MenuPanel extends JPanel {
 		g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 		int w = getWidth();
 		int h = getHeight();
-		Color color1 = new Color(	0,	0,	255,96);
-		Color color2 = new Color(	0,	255,255,96);
+		Color color1 = _originFrame.getTheme().get(0);
+		Color color2 = _originFrame.getTheme().get(1);
 		GradientPaint primary = new GradientPaint(0, 0, color1, w, 0, color2);
 		GradientPaint shade = new GradientPaint(0f, 0f, new Color(0, 0, 0, 0),0f, h, new Color(0, 0, 0, 96));
 		g2d.setPaint(primary);

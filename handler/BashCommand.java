@@ -8,6 +8,8 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
 
 
 public class BashCommand {
@@ -25,6 +27,7 @@ public class BashCommand {
 	
 	public static void setVoice(String voice){
 		_voice = voice;
+		System.out.println(_voice);
 	}
 	public static void setVoiceSpeed(int speed){
 		_voiceSpeed = speed;
@@ -33,7 +36,7 @@ public class BashCommand {
 		_voiceVolume = volume;
 	}
 	public static void setDefault(){
-		_voice = "kal_diphone";
+		_voice = "akl_nz_jdt_diphone";
 		_voiceSpeed = 100;
 		_voiceVolume = 1.0;
 
@@ -102,7 +105,7 @@ public class BashCommand {
 
 
 	/**
-	 * 
+	 * A bash command that converts text to speech using festival using a .scm file to modify the effects of the speech
 	 * @param speech
 	 */
 	public static void sayFestival(String speech){
@@ -121,32 +124,12 @@ public class BashCommand {
 			writer.flush();
 			writer.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			JOptionPane.showMessageDialog(null, "Voice Speech failed to execute!", "Voice Speech Error", JOptionPane.ERROR_MESSAGE);
 		}
 		bashCommand("festival -b .speech.scm");
 	}
 	
-	public static void sayFestival(String speech, int speechSpeed, double speechVol){
-		try {
-			String speechFileName = ".speech.scm";
-			File speechFile = new File(speechFileName);
-			if(!speechFile.exists()){
-				speechFile.createNewFile();
-			}
-			PrintWriter writer = new PrintWriter(speechFile);
-			writer.println("(voice_"+_voice+")");
-			writer.println("(Parameter.set 'Audio_Command \"aplay -q -c 1 -t raw -f s16 -r $(($SR*"+speechSpeed+"/100)) $FILE\")");
-			writer.println("(set! after_synth_hooks (list (lambda (utt) (utt.wave.rescale utt "+speechVol+" t))))");
-
-			writer.println("(SayText \""+speech+"\")");
-			writer.print("(quit)");
-			writer.flush();
-			writer.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		bashCommand("festival -b .speech.scm");
+	public static void saveOptions(){
+		FileHandler.saveOptions(_voice, _voiceSpeed, _voiceVolume);
 	}
 }

@@ -8,6 +8,12 @@ import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 
 public class ImageHandler {
+	/**
+	 * reads the image from a provided fileName
+	 * @param imageFile
+	 * @return
+	 * @throws IOException
+	 */
 	public static BufferedImage getImage(String imageFile) throws IOException{
 		BufferedImage image = ImageIO.read(new File(imageFile));
 		return image;
