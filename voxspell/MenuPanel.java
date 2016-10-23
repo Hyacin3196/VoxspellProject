@@ -85,12 +85,12 @@ public class MenuPanel extends JPanel {
 		welcomeText.setFont(new Font("Comic Sans MS", 1, 48));
 		add(welcomeText);
 
-
+		
 		separator_1 = new JSeparator();
 		separator_1.setMaximumSize(new Dimension(0,100));
 		add(separator_1);
 		
-		
+		//JCombo box for changing the background colour
 		themeChanger = new JComboBox(_originFrame.getThemeListAsPreview());
 		themeChanger.setMaximumSize(new Dimension(100,30));
 		themeChanger.setOpaque(false);

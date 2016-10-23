@@ -52,6 +52,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JComboBox;
 
 public class SpellingQuizPanel extends JPanel {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private VoxspellFrame _originFrame;
 	private CardLayout _cardLayout;
 	private JPanel _cardPanel;
@@ -71,7 +75,7 @@ public class SpellingQuizPanel extends JPanel {
 	private static final int inputListSize = 10;
 	private int _wordsDone = 0;
 	private int _wordsCorrect = 0;
-	private int i = 0;
+	private int i = -1;
 
 
 	private SpeechWorker speaker = new SpeechWorker("");
@@ -95,6 +99,7 @@ public class SpellingQuizPanel extends JPanel {
 	/**
 	 * Create the panel.
 	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public SpellingQuizPanel(VoxspellFrame origin,CardLayout cardLayout, JPanel cards) {
 		_originFrame = origin;
 		_cardLayout = cardLayout;
@@ -103,11 +108,12 @@ public class SpellingQuizPanel extends JPanel {
 		setSize(650,500);
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{46, 27, 61, 20, 12, 81, 75, 71, 76, 0, 14, 0};
-		gridBagLayout.rowHeights = new int[]{31, 119, 34, 32, 72, 49, 0, 38, 0, 0};
+		gridBagLayout.rowHeights = new int[]{31, 119, 46, 0, 0, 33, 32, 0, 38, 0, 0};
 		gridBagLayout.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-		gridBagLayout.rowWeights = new double[]{0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gridBagLayout.rowWeights = new double[]{0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
 		setLayout(gridBagLayout);
 
+		//initialize text field for answering the quiz
 		textField = new JTextField();
 		textField.setFont(new Font("Comic Sans MS", Font.PLAIN, 26));
 		textField.addKeyListener(new KeyAdapter() {
@@ -117,27 +123,25 @@ public class SpellingQuizPanel extends JPanel {
 
 				if(!Character.isAlphabetic(c) && c != '\'') {
 					e.consume();
-					i = 0;
 				}
 
 			}
 			public void keyPressed(KeyEvent e){
 				//cycle through inputed words
 				if(e.getKeyCode()==KeyEvent.VK_UP){
-					if(i>=inputList.size()-1){
+					i++;
+					if(i>inputList.size()-1){
 						i=0;
-					}else{
-						i++;
 					}
 					textField.setText(inputList.get(i));
 				}else if(e.getKeyCode()==KeyEvent.VK_DOWN){
+					i--;
 					if(i<0){
 						i=inputList.size()-1;
-					}else{
-						i--;
 					}
 					textField.setText(inputList.get(i));
-				}else if(e.getKeyCode()==KeyEvent.VK_SLASH){
+				}
+				if(e.getKeyCode()==KeyEvent.VK_SLASH){
 					if(speaker.isDone()){
 						speaker = new SpeechWorker(word);
 						speaker.execute();
@@ -149,6 +153,7 @@ public class SpellingQuizPanel extends JPanel {
 		textField.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
 				if(speaker.isDone()){
+					i = -1;
 					userAnswer = textField.getText();
 
 					// Only check if input is not empty
@@ -156,6 +161,7 @@ public class SpellingQuizPanel extends JPanel {
 						inputList.add(0,userAnswer);
 						while(inputList.size()>inputListSize){
 							inputList.remove(inputList.size()-1);
+							//inputList.remove(0);
 						}
 						_answered = true;
 						textField.setText("");
@@ -165,19 +171,18 @@ public class SpellingQuizPanel extends JPanel {
 				}
 			}
 		});
+		GridBagConstraints gbc_textField = new GridBagConstraints();
+		gbc_textField.gridwidth = 7;
+		gbc_textField.insets = new Insets(0, 0, 5, 5);
+		gbc_textField.fill = GridBagConstraints.HORIZONTAL;
+		gbc_textField.gridx = 2;
+		gbc_textField.gridy = 3;
+		add(textField, gbc_textField);
+		textField.setColumns(10);
 
 
 
-		String[] columnNames = new String[]{"Result","Correct Answer","Your Answer"};
-		fbModel = new FeedbackTableModel(columnNames);
 
-		fbTable = new JTable(fbModel);
-		fbTable.setAutoCreateRowSorter(true);
-		fbTable.changeSelection(0, 0, false, false);
-
-		scrollPane = new JScrollPane(fbTable);
-		//scrollPane.setOpaque(false);
-		scrollPane.setVisible(true);
 
 		separator = new JSeparator();
 		GridBagConstraints gbc_separator = new GridBagConstraints();
@@ -186,40 +191,49 @@ public class SpellingQuizPanel extends JPanel {
 		gbc_separator.gridx = 0;
 		gbc_separator.gridy = 0;
 		add(separator, gbc_separator);
+
+
+		//initialize table showing results of each attempt
+		String[] columnNames = new String[]{"Result","Correct Answer","Your Answer"};
+		fbModel = new FeedbackTableModel(columnNames);
+
+		fbTable = new JTable(fbModel);
+		fbTable.setAutoCreateRowSorter(true);
+		fbTable.changeSelection(0, 0, false, false);
+
+		scrollPane = new JScrollPane(fbTable);
+		scrollPane.setVisible(true);
 		GridBagConstraints gbc_scrollPane = new GridBagConstraints();
-		gbc_scrollPane.gridwidth = 6;
-		gbc_scrollPane.gridheight = 2;
+		gbc_scrollPane.gridwidth = 7;
 		gbc_scrollPane.insets = new Insets(0, 0, 5, 5);
 		gbc_scrollPane.fill = GridBagConstraints.BOTH;
 		gbc_scrollPane.gridx = 2;
 		gbc_scrollPane.gridy = 1;
 		add(scrollPane, gbc_scrollPane);
 
-		/*
-		GridBagConstraints gbc_fbPanel = new GridBagConstraints();
-		gbc_fbPanel.gridheight = 2;
-		gbc_fbPanel.gridwidth = 4;
-		gbc_fbPanel.insets = new Insets(0, 0, 5, 5);
-		gbc_fbPanel.fill = GridBagConstraints.BOTH;
-		gbc_fbPanel.gridx = 2;
-		gbc_fbPanel.gridy = 2;
-		add(fbPanel, gbc_fbPanel);*/
-
+		//initialize label showing how many words out of total have been attempted
 		lblProgress = new JLabel("");
+		lblProgress.setFont(new Font("Comic Sans MS", Font.BOLD, 20));
 		GridBagConstraints gbc_lblProgress = new GridBagConstraints();
 		gbc_lblProgress.insets = new Insets(0, 0, 5, 5);
 		gbc_lblProgress.gridx = 8;
 		gbc_lblProgress.gridy = 2;
 		add(lblProgress, gbc_lblProgress);
 
+		//
 		tryPanel = new JPanel(){
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
 			public void paintComponent(Graphics g){
 				Graphics2D g2d = (Graphics2D) g;
 				g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
 				int w = getWidth();
 				int h = getHeight();
 				if(!_answered){
-					g2d.setColor(Color.white);
+					g2d.setColor(Color.gray);
 					g2d.fillRect(0, 0, w, h);
 				}else if(_firstTry&&_isCorrect){
 					g2d.setColor(Color.green);
@@ -230,7 +244,7 @@ public class SpellingQuizPanel extends JPanel {
 					g2d.setColor(Color.red);
 					g2d.fillRect(0, h/2, w, h);
 				}else if(!_wordDone&&!_isCorrect){
-					g2d.setColor(Color.white);
+					g2d.setColor(Color.gray);
 					g2d.fillRect(0, 0, w, h/2);
 					g2d.setColor(Color.red);
 					g2d.fillRect(0, h/2, w, h);
@@ -246,30 +260,124 @@ public class SpellingQuizPanel extends JPanel {
 		gbc_panel.gridx = 1;
 		gbc_panel.gridy = 3;
 		add(tryPanel, gbc_panel);
-		GridBagConstraints gbc_textField = new GridBagConstraints();
-		gbc_textField.gridwidth = 6;
-		gbc_textField.insets = new Insets(0, 0, 5, 5);
-		gbc_textField.fill = GridBagConstraints.HORIZONTAL;
-		gbc_textField.gridx = 2;
-		gbc_textField.gridy = 3;
-		add(textField, gbc_textField);
-		textField.setColumns(10);
+		
+		
+				//initialize repeat btn
+				btnRepeat = new JButton("Repeat");
+				btnRepeat.addActionListener(new ActionListener(){
+					public void actionPerformed(ActionEvent arg0) {
+						if(speaker.isDone()){
+							speaker = new SpeechWorker(word);//,sliderVoiceSpeed.getValue(),((double)sliderVoiceVolume.getValue())/10.0);
+							speaker.execute();
+						}
+					}
+				});
+				GridBagConstraints gbc_btnRepeat = new GridBagConstraints();
+				gbc_btnRepeat.insets = new Insets(0, 0, 5, 5);
+				gbc_btnRepeat.gridx = 9;
+				gbc_btnRepeat.gridy = 3;
+				add(btnRepeat, gbc_btnRepeat);
 
-		btnRepeat = new JButton("Repeat");
-		btnRepeat.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent arg0) {
-				if(speaker.isDone()){
-					speaker = new SpeechWorker(word);//,sliderVoiceSpeed.getValue(),((double)sliderVoiceVolume.getValue())/10.0);
-					speaker.execute();
-				}
+		//initialize "voice volume" label
+		lblVoiceVolume = new JLabel("<html><center>Voice<br>Volume</center></html>");
+		lblVoiceVolume.setFont(new Font("Comic Sans MS", Font.BOLD, 12));
+		lblVoiceVolume.setHorizontalAlignment(SwingConstants.CENTER);
+		GridBagConstraints gbc_lblVoiceVolume = new GridBagConstraints();
+		gbc_lblVoiceVolume.fill = GridBagConstraints.HORIZONTAL;
+		gbc_lblVoiceVolume.insets = new Insets(0, 0, 5, 5);
+		gbc_lblVoiceVolume.gridx = 2;
+		gbc_lblVoiceVolume.gridy = 5;
+		add(lblVoiceVolume, gbc_lblVoiceVolume);
+
+		//initialize "voice volume" slider
+		sliderVoiceVolume = new JSlider(JSlider.HORIZONTAL);
+		sliderVoiceVolume.setOpaque(false);
+		sliderVoiceVolume.setMaximum(100);
+		sliderVoiceVolume.setMinimum(0);
+		sliderVoiceVolume.setValue(10);
+		sliderVoiceVolume.setMajorTickSpacing(50);
+		sliderVoiceVolume.setMinorTickSpacing(10);
+		sliderVoiceVolume.setPaintTicks(true);
+		sliderVoiceVolume.setPaintLabels(true);
+		sliderVoiceVolume.setLabelTable(sliderVoiceVolume.createStandardLabels(50));
+		sliderVoiceVolume.setPreferredSize(new Dimension(200,30));
+		GridBagConstraints gbc_sliderVoiceVolume = new GridBagConstraints();
+		gbc_sliderVoiceVolume.gridwidth = 4;
+		gbc_sliderVoiceVolume.fill = GridBagConstraints.HORIZONTAL;
+		gbc_sliderVoiceVolume.insets = new Insets(0, 0, 5, 5);
+		gbc_sliderVoiceVolume.gridx = 4;
+		gbc_sliderVoiceVolume.gridy = 5;
+		add(sliderVoiceVolume, gbc_sliderVoiceVolume);
+		sliderVoiceVolume.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent ce) {
+				BashCommand.setVoiceVolume(Math.exp((sliderVoiceVolume.getValue()/25.0)-1));
 			}
 		});
-		GridBagConstraints gbc_btnRepeat = new GridBagConstraints();
-		gbc_btnRepeat.insets = new Insets(0, 0, 5, 5);
-		gbc_btnRepeat.gridx = 8;
-		gbc_btnRepeat.gridy = 3;
-		add(btnRepeat, gbc_btnRepeat);
 
+		//Initialise "voice speed" label
+		lblVoiceSpeed = new JLabel("<html><center>Voice<br> Speed</center></html>");
+		lblVoiceSpeed.setFont(new Font("Comic Sans MS", Font.BOLD, 12));
+		GridBagConstraints gbc_lblVoiceSpeed = new GridBagConstraints();
+		gbc_lblVoiceSpeed.insets = new Insets(0, 0, 5, 5);
+		gbc_lblVoiceSpeed.gridx = 2;
+		gbc_lblVoiceSpeed.gridy = 6;
+		add(lblVoiceSpeed, gbc_lblVoiceSpeed);
+
+		//initialize "voice speed" slider
+		sliderVoiceSpeed = new JSlider(JSlider.HORIZONTAL);
+		sliderVoiceSpeed.setOpaque(false);
+		sliderVoiceSpeed.setMaximum(150);
+		sliderVoiceSpeed.setMinimum(50);
+		sliderVoiceSpeed.setValue(100);
+		sliderVoiceSpeed.setMajorTickSpacing(50);
+		sliderVoiceSpeed.setMinorTickSpacing(10);
+		sliderVoiceSpeed.setPaintTicks(true);
+		sliderVoiceSpeed.setPaintLabels(true);
+		sliderVoiceSpeed.setLabelTable(sliderVoiceSpeed.createStandardLabels(50));
+		sliderVoiceSpeed.setPreferredSize(new Dimension(200,30));
+		GridBagConstraints gbc_sliderVoiceSpeed = new GridBagConstraints();
+		gbc_sliderVoiceSpeed.gridwidth = 4;
+		gbc_sliderVoiceSpeed.fill = GridBagConstraints.HORIZONTAL;
+		gbc_sliderVoiceSpeed.insets = new Insets(0, 0, 5, 5);
+		gbc_sliderVoiceSpeed.gridx = 4;
+		gbc_sliderVoiceSpeed.gridy = 6;
+		add(sliderVoiceSpeed, gbc_sliderVoiceSpeed);
+		sliderVoiceSpeed.addChangeListener(new ChangeListener() {
+			@Override
+			public void stateChanged(ChangeEvent ce) {
+				BashCommand.setVoiceSpeed(sliderVoiceSpeed.getValue());
+			}
+		});
+
+		//initialize "Voice" label
+		lblVoice = new JLabel("Voice");
+		lblVoice.setFont(new Font("Comic Sans MS", Font.BOLD, 12));
+		GridBagConstraints gbc_lblVoice = new GridBagConstraints();
+		gbc_lblVoice.insets = new Insets(0, 0, 5, 5);
+		gbc_lblVoice.gridx = 2;
+		gbc_lblVoice.gridy = 7;
+		add(lblVoice, gbc_lblVoice);
+
+		//initialise "voice" combo box
+		String[] voiceList = FileHandler.getFolderContents("/usr/share/festival/voices/english");
+		voiceComboBox = new JComboBox(voiceList);
+		voiceComboBox.setFont(new Font("Comic Sans MS", Font.BOLD, 12));
+		voiceComboBox.setSelectedItem((String)BashCommand.getVoice());
+		GridBagConstraints gbc_comboBox = new GridBagConstraints();
+		gbc_comboBox.gridwidth = 4;
+		gbc_comboBox.insets = new Insets(0, 0, 5, 5);
+		gbc_comboBox.fill = GridBagConstraints.HORIZONTAL;
+		gbc_comboBox.gridx = 4;
+		gbc_comboBox.gridy = 7;
+		add(voiceComboBox, gbc_comboBox);
+		voiceComboBox.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent arg0) {
+				BashCommand.setVoice((String)voiceComboBox.getSelectedItem());
+			}
+		});
+
+		//initialise next word
 		btnNextWord = new JButton("Next Word");
 		btnNextWord.setEnabled(false);
 		btnNextWord.addActionListener(new ActionListener(){
@@ -288,143 +396,47 @@ public class SpellingQuizPanel extends JPanel {
 				}
 			}
 		});
-		
-				lblVoiceVolume = new JLabel("<html><center>Voice<br>Volume</center></html>");
-				lblVoiceVolume.setFont(new Font("Comic Sans MS", Font.BOLD, 12));
-				lblVoiceVolume.setHorizontalAlignment(SwingConstants.CENTER);
-				GridBagConstraints gbc_lblVoiceVolume = new GridBagConstraints();
-				gbc_lblVoiceVolume.fill = GridBagConstraints.HORIZONTAL;
-				gbc_lblVoiceVolume.insets = new Insets(0, 0, 5, 5);
-				gbc_lblVoiceVolume.gridx = 2;
-				gbc_lblVoiceVolume.gridy = 4;
-				add(lblVoiceVolume, gbc_lblVoiceVolume);
-
-		sliderVoiceVolume = new JSlider(JSlider.HORIZONTAL);
-		sliderVoiceVolume.setOpaque(false);
-		sliderVoiceVolume.setMaximum(100);
-		sliderVoiceVolume.setMinimum(0);
-		sliderVoiceVolume.setValue(10);
-		sliderVoiceVolume.setMajorTickSpacing(50);
-		sliderVoiceVolume.setMinorTickSpacing(10);
-		sliderVoiceVolume.setPaintTicks(true);
-		sliderVoiceVolume.setPaintLabels(true);
-		sliderVoiceVolume.setLabelTable(sliderVoiceVolume.createStandardLabels(50));
-		sliderVoiceVolume.setPreferredSize(new Dimension(200,60));
-		GridBagConstraints gbc_sliderVoiceVolume = new GridBagConstraints();
-		gbc_sliderVoiceVolume.gridwidth = 4;
-		gbc_sliderVoiceVolume.fill = GridBagConstraints.HORIZONTAL;
-		gbc_sliderVoiceVolume.insets = new Insets(0, 0, 5, 5);
-		gbc_sliderVoiceVolume.gridx = 4;
-		gbc_sliderVoiceVolume.gridy = 4;
-		add(sliderVoiceVolume, gbc_sliderVoiceVolume);
-		sliderVoiceVolume.addChangeListener(new ChangeListener() {
-			@Override
-			public void stateChanged(ChangeEvent ce) {
-				BashCommand.setVoiceVolume(Math.exp((sliderVoiceVolume.getValue()/25.0)-1));
-				//System.out.println(((JSlider) ce.getSource()).getValue());
-			}
-		});
-
-
-		String[] voiceList = FileHandler.getFolderContents("/usr/share/festival/voices/english");
-
-		sliderVoiceSpeed = new JSlider(JSlider.HORIZONTAL);
-		sliderVoiceSpeed.setOpaque(false);
-		sliderVoiceSpeed.setMaximum(150);
-		sliderVoiceSpeed.setMinimum(50);
-		sliderVoiceSpeed.setValue(100);
-		sliderVoiceSpeed.setMajorTickSpacing(50);
-		sliderVoiceSpeed.setMinorTickSpacing(10);
-		sliderVoiceSpeed.setPaintTicks(true);
-		sliderVoiceSpeed.setPaintLabels(true);
-		sliderVoiceSpeed.setLabelTable(sliderVoiceSpeed.createStandardLabels(50));
-		
-				lblVoiceSpeed = new JLabel("<html><center>Voice<br> Speed</center></html>");
-				lblVoiceSpeed.setFont(new Font("Comic Sans MS", Font.BOLD, 12));
-				GridBagConstraints gbc_lblVoiceSpeed = new GridBagConstraints();
-				gbc_lblVoiceSpeed.insets = new Insets(0, 0, 5, 5);
-				gbc_lblVoiceSpeed.gridx = 2;
-				gbc_lblVoiceSpeed.gridy = 5;
-				add(lblVoiceSpeed, gbc_lblVoiceSpeed);
-		sliderVoiceSpeed.setPreferredSize(new Dimension(200,60));
-		GridBagConstraints gbc_sliderVoiceSpeed = new GridBagConstraints();
-		gbc_sliderVoiceSpeed.gridwidth = 4;
-		gbc_sliderVoiceSpeed.fill = GridBagConstraints.HORIZONTAL;
-		gbc_sliderVoiceSpeed.insets = new Insets(0, 0, 5, 5);
-		gbc_sliderVoiceSpeed.gridx = 4;
-		gbc_sliderVoiceSpeed.gridy = 5;
-		add(sliderVoiceSpeed, gbc_sliderVoiceSpeed);
-		sliderVoiceSpeed.addChangeListener(new ChangeListener() {
-			@Override
-			public void stateChanged(ChangeEvent ce) {
-				BashCommand.setVoiceSpeed(sliderVoiceSpeed.getValue());
-				System.out.println(((JSlider) ce.getSource()).getValue());
-			}
-		});
-		
-		lblVoice = new JLabel("Voice");
-		lblVoice.setFont(new Font("Comic Sans MS", Font.BOLD, 12));
-		GridBagConstraints gbc_lblVoice = new GridBagConstraints();
-		gbc_lblVoice.insets = new Insets(0, 0, 5, 5);
-		gbc_lblVoice.gridx = 2;
-		gbc_lblVoice.gridy = 6;
-		add(lblVoice, gbc_lblVoice);
-		
-		
-		voiceComboBox = new JComboBox(voiceList);
-		voiceComboBox.setFont(new Font("Comic Sans MS", Font.BOLD, 12));
-		voiceComboBox.setSelectedItem((String)BashCommand.getVoice());
-		GridBagConstraints gbc_comboBox = new GridBagConstraints();
-		gbc_comboBox.gridwidth = 4;
-		gbc_comboBox.insets = new Insets(0, 0, 5, 5);
-		gbc_comboBox.fill = GridBagConstraints.HORIZONTAL;
-		gbc_comboBox.gridx = 4;
-		gbc_comboBox.gridy = 6;
-		add(voiceComboBox, gbc_comboBox);
-		voiceComboBox.addActionListener(new ActionListener(){
-			public void actionPerformed(ActionEvent arg0) {
-				BashCommand.setVoice((String)voiceComboBox.getSelectedItem());
-			}
-		});
 		GridBagConstraints gbc_btnNextWord = new GridBagConstraints();
 		gbc_btnNextWord.gridwidth = 7;
 		gbc_btnNextWord.insets = new Insets(0, 0, 5, 5);
 		gbc_btnNextWord.gridx = 2;
-		gbc_btnNextWord.gridy = 7;
+		gbc_btnNextWord.gridy = 8;
 		add(btnNextWord, gbc_btnNextWord);
 
 		separator_1 = new JSeparator();
 		GridBagConstraints gbc_separator_1 = new GridBagConstraints();
 		gbc_separator_1.insets = new Insets(0, 0, 5, 5);
 		gbc_separator_1.gridx = 9;
-		gbc_separator_1.gridy = 7;
+		gbc_separator_1.gridy = 8;
 		add(separator_1, gbc_separator_1);
-				
-						btnBack = new JButton("Back");
-						btnBack.addActionListener(new ActionListener(){
-							public void actionPerformed(ActionEvent arg0) {
-								_cardLayout.show(_cardPanel, "PreSpellingQuiz");
-								SoundWorker.playSound("pop.wav");
-							}
-						});
-						
-								btnExit = new JButton("Exit");
-								btnExit.addActionListener(new ActionListener(){
-									public void actionPerformed(ActionEvent arg0) {
-										_cardLayout.show(_cardPanel, "Menu");
-										SoundWorker.playSound("pop.wav");
-									}
-								});
-								GridBagConstraints gbc_btnExit = new GridBagConstraints();
-								gbc_btnExit.insets = new Insets(0, 0, 0, 5);
-								gbc_btnExit.gridx = 8;
-								gbc_btnExit.gridy = 8;
-								add(btnExit, gbc_btnExit);
-						GridBagConstraints gbc_btnBack = new GridBagConstraints();
-						gbc_btnBack.insets = new Insets(0, 0, 0, 5);
-						gbc_btnBack.gridx = 9;
-						gbc_btnBack.gridy = 8;
-						add(btnBack, gbc_btnBack);
+
+		//initialize back button
+		btnBack = new JButton("Back");
+		btnBack.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent arg0) {
+				_cardLayout.show(_cardPanel, "PreSpellingQuiz");
+				SoundWorker.playSound("pop.wav");
+			}
+		});
+		GridBagConstraints gbc_btnBack = new GridBagConstraints();
+		gbc_btnBack.insets = new Insets(0, 0, 0, 5);
+		gbc_btnBack.gridx = 9;
+		gbc_btnBack.gridy = 9;
+		add(btnBack, gbc_btnBack);
+
+		//initialize exit button
+		btnExit = new JButton("Exit");
+		btnExit.addActionListener(new ActionListener(){
+			public void actionPerformed(ActionEvent arg0) {
+				_cardLayout.show(_cardPanel, "Menu");
+				SoundWorker.playSound("pop.wav");
+			}
+		});
+		GridBagConstraints gbc_btnExit = new GridBagConstraints();
+		gbc_btnExit.insets = new Insets(0, 0, 0, 5);
+		gbc_btnExit.gridx = 8;
+		gbc_btnExit.gridy = 9;
+		add(btnExit, gbc_btnExit);
 	}
 
 
@@ -443,8 +455,13 @@ public class SpellingQuizPanel extends JPanel {
 			wordList = wordList.subList(0, listSize);
 		}
 		word = wordList.get(0);
-
+		if(wordList.size()<=1){
+			btnNextWord.setText("Finish");
+		}else{
+			btnNextWord.setText("Next Word");
+		}
 		//start progress
+		i=-1;
 		_wordsDone = 0;
 		_wordsCorrect = 0;
 		lblProgress.setText(_wordsDone+"/"+listSize);
@@ -467,7 +484,7 @@ public class SpellingQuizPanel extends JPanel {
 		voiceComboBox.setSelectedItem(BashCommand.getVoice());
 
 		//speak the word
-		speaker = new SpeechWorker(word);
+		speaker = new SpeechWorker("Spell the word? "+word);
 		speaker.execute();
 
 		//update the panel colors
@@ -514,19 +531,33 @@ public class SpellingQuizPanel extends JPanel {
 			_wordsDone++;
 			wordList.remove(word);
 			System.out.println(wordList);
+			
+			//change text on button to indicate the last word
+			if(wordList.size()<=1){
+				btnNextWord.setText("Finish");
+			}else{
+				btnNextWord.setText("Next Word");
+			}
+			
 			if(wordList.size()<=0){
 				_quizDone = true;
 
-				QuizFinishFrame qfFrame = new QuizFinishFrame(_originFrame,_cardLayout,_cardPanel, "<html><center>You finished the quiz<br>"
-						+ "You scored "+_wordsCorrect+"/"+listSize+"</center><html>");
-				qfFrame.setVisible(true);
+				if(0.8<=((double)_wordsCorrect)/((double)_wordsDone)){
+					QuizFinishFrame qfFrame = new QuizFinishFrame(_originFrame,_cardLayout,_cardPanel, "<html><center>Congratulations!<br>"
+							+ "You scored "+_wordsCorrect+"/"+listSize+"</center><html>",true);
+					qfFrame.setVisible(true);
+				}else{
+					QuizFinishFrame qfFrame = new QuizFinishFrame(_originFrame,_cardLayout,_cardPanel, "<html><center>Too bad!<br>"
+							+ "You only scored "+_wordsCorrect+"/"+listSize+"</center><html>",false);
+					qfFrame.setVisible(true);
+				}
 				_originFrame.setEnabled(false);
 			}else{
 				word = wordList.get(0);
 
 				//debugWord.setText(word);
 
-				speaker = new SpeechWorker(word);//,sliderVoiceSpeed.getValue(),((double)sliderVoiceVolume.getValue())/10.0);
+				speaker = new SpeechWorker("Spell the word? "+word);//,sliderVoiceSpeed.getValue(),((double)sliderVoiceVolume.getValue())/10.0);
 				speaker.execute();
 			}
 		}

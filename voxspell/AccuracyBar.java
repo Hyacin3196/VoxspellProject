@@ -43,6 +43,7 @@ public class AccuracyBar extends BufferedImage{
 	}
 	
 	public ImageIcon convertToImageIcon(){
-		return new ImageIcon(this);
+		
+		return new AccuracyBarIcon(this,_accuracy);
 	}
 }

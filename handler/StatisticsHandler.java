@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 import javax.swing.table.DefaultTableModel;
 
 import voxspell.AccuracyBar;
+import voxspell.AccuracyBarIcon;
 import voxspell.Percentage;
 
 /*
@@ -121,12 +122,12 @@ public class StatisticsHandler {
 			@Override
 			public Class getColumnClass(int column)
 			{
-				if (column == 2) return ImageIcon.class; 
+				if (column == 2) return AccuracyBarIcon.class; 
 				if (column == 3) return Percentage.class; 
 				return String.class;
 			}
 		};
-		tableModel.setColumnIdentifiers(new String[]{"SpellingList", "Word", "Accuracy", ""});
+		tableModel.setColumnIdentifiers(new String[]{"SpellingList", "Word", "Accuracy", "Accuracy%"});
 		
 		statsList.forEach((row) -> {
 			tableModel.addRow(row);

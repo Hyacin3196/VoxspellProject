@@ -56,6 +56,7 @@ public class PreSpellingQuizPanel extends JPanel {
 	private JButton btnBack;
 	private JSlider sliderQuizSize;
 	private JTextField quizSizeTextField;
+	private JLabel lblChooseSpellingList;
 
 	//private Quiz quiz;
 
@@ -75,15 +76,14 @@ public class PreSpellingQuizPanel extends JPanel {
 		gridBagLayout.rowWeights = new double[]{1.0, 0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
 		setLayout(gridBagLayout);
 
+		//create list for the Spelling List Combo box
 		String[] spellingListList =  FileHandler.getFolderContents("spelling_lists");
-		
+
+		//create list for the Voice List Combo box
 		String[] voiceList = FileHandler.getFolderContents("/usr/share/festival/voices/english");
 
-		/**
-		 * sets the required options in the SpellingQuiz and then initiates the Quiz
-		 */
-
-		JLabel lblChooseSpellingList = new JLabel("Choose Spelling List:");
+		//initialise Choose spellingList label
+		lblChooseSpellingList = new JLabel("Choose Spelling List:");
 		lblChooseSpellingList.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblChooseSpellingList.setFont(new Font("Comic Sans MS", Font.BOLD, 12));
 		GridBagConstraints gbc_lblChooseSpellingList = new GridBagConstraints();
@@ -92,6 +92,8 @@ public class PreSpellingQuizPanel extends JPanel {
 		gbc_lblChooseSpellingList.gridx = 1;
 		gbc_lblChooseSpellingList.gridy = 1;
 		this.add(lblChooseSpellingList, gbc_lblChooseSpellingList);
+
+		//initialise Choose spellingList comboBox
 		spellingListComboBox = new JComboBox(spellingListList);
 		spellingListComboBox.setFont(new Font("Comic Sans MS", Font.BOLD, 12));
 		spellingListComboBox.setSelectedIndex(0);
@@ -103,6 +105,7 @@ public class PreSpellingQuizPanel extends JPanel {
 		gbc_comboBox.gridy = 1;
 		this.add(spellingListComboBox, gbc_comboBox);
 
+		//initialise "Choose word number" label
 		lblNumberOfWords = new JLabel("Number of Words to Test:");
 		lblNumberOfWords.setHorizontalAlignment(SwingConstants.RIGHT);
 		lblNumberOfWords.setFont(new Font("Comic Sans MS", Font.BOLD, 12));
@@ -112,6 +115,7 @@ public class PreSpellingQuizPanel extends JPanel {
 		gbc_lblNumberOfWords.gridy = 2;
 		this.add(lblNumberOfWords, gbc_lblNumberOfWords);
 
+		//initialise slider for choosing quiz size
 		sliderQuizSize = new JSlider();
 		sliderQuizSize.setPreferredSize(new Dimension(350,50));
 		sliderQuizSize.setOpaque(false);
@@ -135,6 +139,7 @@ public class PreSpellingQuizPanel extends JPanel {
 			}
 		});
 
+		//initialise text field to enter exact value of quiz size
 		quizSizeTextField = new JTextField();
 		quizSizeTextField.setFont(new Font("Courier 10 Pitch", Font.PLAIN, 12));
 		quizSizeTextField.setText(""+sliderQuizSize.getValue());
@@ -189,20 +194,22 @@ public class PreSpellingQuizPanel extends JPanel {
 				}
 			}
 		});
+
+		//initialise "choose voice" label
+		lblVoice = new JLabel("Voice:");
+		lblVoice.setHorizontalAlignment(SwingConstants.RIGHT);
+		lblVoice.setFont(new Font("Comic Sans MS", Font.BOLD, 12));
+		GridBagConstraints gbc_lblVoice = new GridBagConstraints();
+		gbc_lblVoice.anchor = GridBagConstraints.EAST;
+		gbc_lblVoice.insets = new Insets(0, 0, 5, 5);
+		gbc_lblVoice.gridx = 1;
+		gbc_lblVoice.gridy = 3;
+		this.add(lblVoice, gbc_lblVoice);
 		
-				lblVoice = new JLabel("Voice:");
-				lblVoice.setHorizontalAlignment(SwingConstants.RIGHT);
-				lblVoice.setFont(new Font("Comic Sans MS", Font.BOLD, 12));
-				GridBagConstraints gbc_lblVoice = new GridBagConstraints();
-				gbc_lblVoice.anchor = GridBagConstraints.EAST;
-				gbc_lblVoice.insets = new Insets(0, 0, 5, 5);
-				gbc_lblVoice.gridx = 1;
-				gbc_lblVoice.gridy = 3;
-				this.add(lblVoice, gbc_lblVoice);
+		//initialise "choose voice" combo box
 		voiceComboBox = new JComboBox(voiceList);
 		voiceComboBox.setFont(new Font("Comic Sans MS", Font.BOLD, 12));
 		voiceComboBox.setSelectedItem(BashCommand.getVoice());
-		System.out.println(BashCommand.getVoice());
 		GridBagConstraints gbc_comboBox_1 = new GridBagConstraints();
 		gbc_comboBox_1.gridwidth = 2;
 		gbc_comboBox_1.insets = new Insets(0, 0, 5, 5);
@@ -213,9 +220,10 @@ public class PreSpellingQuizPanel extends JPanel {
 		voiceComboBox.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
 				BashCommand.setVoice((String)voiceComboBox.getSelectedItem());
-				System.out.println(voiceComboBox.getSelectedItem());
 			}
 		});
+		
+		//initialise "continue" button
 		btnContinue = new JButton("Continue");
 		btnContinue.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
@@ -243,7 +251,7 @@ public class PreSpellingQuizPanel extends JPanel {
 		gbc_btnContinue.gridy = 5;
 		this.add(btnContinue, gbc_btnContinue);
 
-
+		//initialise "back to menu" button
 		btnBack = new JButton("Back");
 		btnBack.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
@@ -256,15 +264,13 @@ public class PreSpellingQuizPanel extends JPanel {
 		gbc_btnBack.gridx = 4;
 		gbc_btnBack.gridy = 5;
 		this.add(btnBack, gbc_btnBack);
-		_originFrame = origin;
-		_cardLayout = cardLayout;
-		_cardPanel = cards;
+		
 	}
-	
+
 	public void startPreQuiz(){
 		voiceComboBox.setSelectedItem(BashCommand.getVoice());
 	}
-	
+
 	/**
 	 * Adds painting to the PreSpelling Panel
 	 */

@@ -34,10 +34,11 @@ public class QuizFinishFrame extends JFrame {
 	private JPanel _cardPanel;
 	private JPanel contentPane;
 	private VoxspellFrame _originFrame;
+
 	/**
 	 * Create the frame.
 	 */
-	public QuizFinishFrame(VoxspellFrame origin,CardLayout cardLayout, JPanel cards, String congratulatory) {
+	public QuizFinishFrame(VoxspellFrame origin,CardLayout cardLayout, JPanel cards, String congratulatory, boolean isPassed) {
 		_originFrame = origin;
 		_cardLayout = cardLayout;
 		_cardPanel = cards;
@@ -94,17 +95,15 @@ public class QuizFinishFrame extends JFrame {
 		contentPane.add(btnRedoQuiz, gbc_btnRedoQuiz);
 		btnRedoQuiz.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
-				SoundWorker.playSound("pop.wav");
-				
-				//start a new quiz
 				_originFrame._spellingQuiz.startQuiz();
+				SoundWorker.playSound("pop.wav");
 				QuizFinishFrame.this.dispatchEvent(new WindowEvent(QuizFinishFrame.this, WindowEvent.WINDOW_CLOSING));
 				_originFrame.setEnabled(true);
 			}
 		});
 		
-		//initialize play button
 		JButton btnPlayVideo = new JButton("Play Video Reward");
+		btnPlayVideo.setEnabled(isPassed);
 		btnPlayVideo.setFont(new Font("Comic Sans MS", Font.BOLD, 10));
 		GridBagConstraints gbc_btnPlayVideo = new GridBagConstraints();
 		gbc_btnPlayVideo.insets = new Insets(0, 0, 5, 5);
@@ -113,9 +112,6 @@ public class QuizFinishFrame extends JFrame {
 		contentPane.add(btnPlayVideo, gbc_btnPlayVideo);
 		btnPlayVideo.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				SoundWorker.playSound("pop.wav");
-				
-				//plays video reward then goes to menu screen
 				QuizFinishFrame.this.dispatchEvent(new WindowEvent(QuizFinishFrame.this, WindowEvent.WINDOW_CLOSING));
 				_originFrame.setEnabled(true);
 				_cardLayout.show(_cardPanel, "Menu");
@@ -123,7 +119,6 @@ public class QuizFinishFrame extends JFrame {
 			}
 		});
 		
-		//initialize Menu Button
 		JButton btnMenu = new JButton("Menu");
 		btnMenu.setFont(new Font("Comic Sans MS", Font.BOLD, 10));
 		GridBagConstraints gbc_btnMenu = new GridBagConstraints();
@@ -133,7 +128,6 @@ public class QuizFinishFrame extends JFrame {
 		contentPane.add(btnMenu, gbc_btnMenu);
 		btnMenu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				//reactivates main JFrame and goes to Menu Panel
 				QuizFinishFrame.this.dispatchEvent(new WindowEvent(QuizFinishFrame.this, WindowEvent.WINDOW_CLOSING));
 				_originFrame.setEnabled(true);
 				_cardLayout.show(_cardPanel, "Menu");
@@ -142,14 +136,9 @@ public class QuizFinishFrame extends JFrame {
 			}
 		});
 		
-		//do the same thing as the Menu button
 		this.addWindowListener(new WindowAdapter(){
 			public void windowClosing(WindowEvent arg0) {
-				QuizFinishFrame.this.dispatchEvent(new WindowEvent(QuizFinishFrame.this, WindowEvent.WINDOW_CLOSING));
 				_originFrame.setEnabled(true);
-				_cardLayout.show(_cardPanel, "Menu");
-
-				SoundWorker.playSound("pop.wav");
 			}
 		});
 	}

@@ -28,7 +28,6 @@ public class VoxspellFrame extends JFrame {
 	private JPanel contentPane;
 
 	private List<Color> _theme = new ArrayList<Color>();
-
 	private List<List<Color>> _themeList = new ArrayList<List<Color>>();
 
 	/**
@@ -135,22 +134,27 @@ public class VoxspellFrame extends JFrame {
 		th.add(new Color(0,255,255,96));
 		_themeList.add(th);
 
+		//set default theme
 		_theme.add(new Color(0,0,255,96));
 		_theme.add(new Color(0,255,255,96));
 
+		//initialise all the panels
 		_menu = new MenuPanel(this, _cardLayout, contentPane);
 		_preSpellingQuiz = new PreSpellingQuizPanel(this, _cardLayout, contentPane);
 		_spellingQuiz = new SpellingQuizPanel(this, _cardLayout, contentPane);
 		_viewStats = new ViewStatistics(this, _cardLayout, contentPane);
 
+		//add all the panels in the content pane
 		contentPane.add(_menu,"Menu");
 		contentPane.add(_preSpellingQuiz,"PreSpellingQuiz");
 		contentPane.add(_spellingQuiz,"SpellingQuiz");
 		contentPane.add(_viewStats,"ViewStats");
 		_cardLayout.show(contentPane, "Menu");
 
+		//play sound on startup
 		singer.execute();
 
+		//when window closes
 		this.addWindowListener(new java.awt.event.WindowAdapter() {
 			@Override
 			public void windowClosing(java.awt.event.WindowEvent windowEvent) {
