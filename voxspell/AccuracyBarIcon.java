@@ -3,7 +3,9 @@ package voxspell;
 import java.awt.Image;
 
 import javax.swing.ImageIcon;
-
+/**
+ * @author jdum654
+ */
 @SuppressWarnings("serial")
 public class AccuracyBarIcon extends ImageIcon implements Comparable<AccuracyBarIcon>{
 

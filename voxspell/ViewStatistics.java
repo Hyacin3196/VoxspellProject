@@ -22,9 +22,12 @@ import javax.swing.table.DefaultTableModel;
 import handler.StatisticsHandler;
 import worker.SoundWorker;
 
-/*
+/**
  * This class is used to visually update and display
  * the statistics of the words attempted
+ * 
+ * @author jdum654, and  atan932
+ *
  */
 @SuppressWarnings("serial")
 public class ViewStatistics extends JPanel{
@@ -58,6 +61,7 @@ public class ViewStatistics extends JPanel{
 		table.setAutoCreateRowSorter(true);
 
 		buttonPanel = new JPanel();
+		buttonPanel.setOpaque(false);
 		buttonPanel.setLayout(new BorderLayout());
 
 
@@ -67,7 +71,8 @@ public class ViewStatistics extends JPanel{
 		backToMenu.setAlignmentX(CENTER_ALIGNMENT);
 		backToMenu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				SoundWorker.playSound("pop.wav");
+				_originFrame.singer = new SoundWorker("boot.wav");
+				_originFrame.singer.execute();
 				_cardLayout.show(_cardPanel, "Menu");
 			}		
 		}); 
@@ -78,7 +83,8 @@ public class ViewStatistics extends JPanel{
 		clear.setAlignmentX(CENTER_ALIGNMENT);
 		clear.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				SoundWorker.playSound("pop.wav");
+				_originFrame.singer = new SoundWorker("boot.wav");
+				_originFrame.singer.execute();
 
 				if (JOptionPane.showConfirmDialog(ViewStatistics.this, 
 						"<html>Are you sure you want to clear your stats?<br>This can't be undone</html>", "Clear Stats", 
@@ -97,6 +103,8 @@ public class ViewStatistics extends JPanel{
 		// Add ability to scroll
 		scrollPane = new JScrollPane(table);
 		scrollPane.setVisible(true);
+		scrollPane.setVerticalScrollBarPolicy(
+				   JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
 		// Add components
 		add(scrollPane, BorderLayout.CENTER);

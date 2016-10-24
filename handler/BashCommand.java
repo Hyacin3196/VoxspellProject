@@ -11,7 +11,9 @@ import java.util.List;
 import javax.swing.JOptionPane;
 
 
-
+/**
+ * @author jdum654
+ */
 public class BashCommand {
 	static Process currentProcess;
 

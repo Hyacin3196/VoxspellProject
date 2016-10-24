@@ -1,5 +1,7 @@
 package voxspell;
-
+/**
+ * @author jdum654
+ */
 public class Percentage implements Comparable<Percentage> {
 	private double _percentage;
 	

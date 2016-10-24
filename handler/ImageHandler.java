@@ -5,8 +5,9 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
-import javax.swing.JOptionPane;
-
+/**
+ * @author jdum654
+ */
 public class ImageHandler {
 	/**
 	 * reads the image from a provided fileName

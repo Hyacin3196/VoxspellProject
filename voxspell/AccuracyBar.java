@@ -9,8 +9,9 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
-
-@SuppressWarnings("serial")
+/**
+ * @author jdum654
+ */
 public class AccuracyBar extends BufferedImage{
 
 	private double _accuracy;

@@ -43,7 +43,9 @@ import worker.SoundWorker;
 import javax.swing.JTextField;
 import javax.swing.JSeparator;
 import javax.swing.JTextArea;
-
+/**
+ * @author jdum654
+ */
 public class PreSpellingQuizPanel extends JPanel {
 	private VoxspellFrame _originFrame;
 	private CardLayout _cardLayout;
@@ -242,7 +244,8 @@ public class PreSpellingQuizPanel extends JPanel {
 					JOptionPane.showMessageDialog(PreSpellingQuizPanel.this, "Invalid quiz number!", "Error", JOptionPane.ERROR_MESSAGE);
 				}
 
-				SoundWorker.playSound("pop.wav");
+				_originFrame.singer = new SoundWorker("boot.wav");
+				_originFrame.singer.execute();
 			}
 		});
 		GridBagConstraints gbc_btnContinue = new GridBagConstraints();
@@ -257,7 +260,8 @@ public class PreSpellingQuizPanel extends JPanel {
 			public void actionPerformed(ActionEvent arg0) {
 				_cardLayout.show(_cardPanel, "Menu");
 
-				SoundWorker.playSound("pop.wav");
+				_originFrame.singer = new SoundWorker("boot.wav");
+				_originFrame.singer.execute();
 			}
 		});
 		GridBagConstraints gbc_btnBack = new GridBagConstraints();

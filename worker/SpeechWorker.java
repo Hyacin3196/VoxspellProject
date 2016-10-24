@@ -3,7 +3,9 @@ package worker;
 import javax.swing.SwingWorker;
 
 import handler.BashCommand;
-
+/**
+ * @author jdum654
+ */
 public class SpeechWorker extends SwingWorker<Void,Void>{
 	
 	

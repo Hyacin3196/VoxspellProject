@@ -17,12 +17,14 @@ import voxspell.AccuracyBar;
 import voxspell.AccuracyBarIcon;
 import voxspell.Percentage;
 
-/*
+/**
  * This class will contain arrays which holds the statistics
  * for the words spelled
  * 
  * It also contains methods for updating statistics as well as 
- * retrieving statistics
+ * retrieving statistics/
+ * @author jdum654
+ *
  */
 public class StatisticsHandler {
 	public static final int MASTERED = 0;

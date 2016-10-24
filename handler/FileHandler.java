@@ -21,6 +21,7 @@ import javax.swing.JOptionPane;
 /**
  * This is a class with static methods which
  * will be used to handle anything related to files
+ * @author jdum654
  */
 public class FileHandler {
 	private static final String wordFileName = "NZCER-spelling-lists.txt";

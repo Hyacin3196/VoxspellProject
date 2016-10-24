@@ -23,6 +23,9 @@ import handler.StatisticsHandler;
 import worker.SoundWorker;
 
 @SuppressWarnings("serial")
+/**
+ * @author jdum654
+ */
 public class VoxspellFrame extends JFrame {
 
 	private JPanel contentPane;

@@ -38,8 +38,8 @@ import com.sun.jna.Native;
 import com.sun.jna.NativeLibrary;
 
 /**
- * This class was made entirely by Andy Tang
- * @author Andy Tang
+ * This class was made almost entirely by Andy Tang
+ * @author Andy Tang; atan932
  *
  */
 @SuppressWarnings("serial")
@@ -100,7 +100,7 @@ public class VideoReward extends JFrame{
 					}
 				});
 			}
-		}, 0L, 1L, TimeUnit.MILLISECONDS);
+		}, 0L, 1000L, TimeUnit.MILLISECONDS);
 
 		// Set up button panel
 		buttonPanel = new JPanel();
@@ -190,14 +190,14 @@ public class VideoReward extends JFrame{
 		 */
 		progressBar.addChangeListener(new ChangeListener() {
 			public void stateChanged(ChangeEvent e) {
-				if(!syncTimeline) //only if user moves the slider by hand
-				{
+				//if(!syncTimeline) //only if user moves the slider by hand
+				//{
 					if(!progressBar.getValueIsAdjusting()) //and the slider is fixed
 					{
 						//recalc to 0.x percent value
 						video.setPosition((float)progressBar.getValue()/100.0f);
 					}                   
-				}
+				//}
 			}
 		});
 		video.addMediaPlayerEventListener(new MediaPlayerEventAdapter(){

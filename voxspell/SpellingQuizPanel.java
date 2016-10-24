@@ -50,7 +50,9 @@ import worker.SpeechWorker;
 
 import javax.swing.JScrollPane;
 import javax.swing.JComboBox;
-
+/**
+ * @author jdum654
+ */
 public class SpellingQuizPanel extends JPanel {
 	/**
 	 * 
@@ -203,6 +205,8 @@ public class SpellingQuizPanel extends JPanel {
 
 		scrollPane = new JScrollPane(fbTable);
 		scrollPane.setVisible(true);
+		scrollPane.setVerticalScrollBarPolicy(
+				   JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		GridBagConstraints gbc_scrollPane = new GridBagConstraints();
 		gbc_scrollPane.gridwidth = 7;
 		gbc_scrollPane.insets = new Insets(0, 0, 5, 5);
@@ -415,7 +419,8 @@ public class SpellingQuizPanel extends JPanel {
 		btnBack.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
 				_cardLayout.show(_cardPanel, "PreSpellingQuiz");
-				SoundWorker.playSound("pop.wav");
+				_originFrame.singer = new SoundWorker("boot.wav");
+				_originFrame.singer.execute();
 			}
 		});
 		GridBagConstraints gbc_btnBack = new GridBagConstraints();
@@ -429,7 +434,8 @@ public class SpellingQuizPanel extends JPanel {
 		btnExit.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
 				_cardLayout.show(_cardPanel, "Menu");
-				SoundWorker.playSound("pop.wav");
+				_originFrame.singer = new SoundWorker("boot.wav");
+				_originFrame.singer.execute();
 			}
 		});
 		GridBagConstraints gbc_btnExit = new GridBagConstraints();
@@ -503,19 +509,22 @@ public class SpellingQuizPanel extends JPanel {
 				btnNextWord.setEnabled(true);
 				btnNextWord.requestFocus();
 				fbModel.addWord(true,word,userAnswer);
-				SoundWorker.playSound("correct.wav");
+				_originFrame.singer = new SoundWorker("correct.wav");
+				_originFrame.singer.execute();
 				StatisticsHandler.updateStatistics(wordListName, word, true);
 			}else if(!input.equalsIgnoreCase(word)&&_firstTry){
 				_isCorrect = false;
 				_firstTry = false;
-				SoundWorker.playSound("wrong.wav");
+				_originFrame.singer = new SoundWorker("wrong.wav");
+				_originFrame.singer.execute();
 			}else if(!input.equalsIgnoreCase(word)&&!_firstTry){
 				_isCorrect = false;
 				_wordDone = true;
 				btnNextWord.setEnabled(true);
 				btnNextWord.requestFocus();
 				fbModel.addWord(false,word,userAnswer);
-				SoundWorker.playSound("wrong.wav");
+				_originFrame.singer = new SoundWorker("wrong.wav");
+				_originFrame.singer.execute();
 				StatisticsHandler.updateStatistics(wordListName, word, false);
 			}
 			tryPanel.repaint();

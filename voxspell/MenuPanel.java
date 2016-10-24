@@ -49,6 +49,9 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 
 @SuppressWarnings("serial")
+/**
+ * @author jdum654
+ */
 public class MenuPanel extends JPanel {
 	private VoxspellFrame _originFrame;
 	private JPanel _cardPanel;
@@ -124,8 +127,8 @@ public class MenuPanel extends JPanel {
 		btnExit.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				SoundWorker.playSound("boot.wav");
-
+				_originFrame.singer = new SoundWorker("boot.wav");
+				_originFrame.singer.execute();
 				if (JOptionPane.showConfirmDialog(MenuPanel.this, 
 						"Are you sure to close this window?", "Really Closing?", 
 						JOptionPane.YES_NO_OPTION,
@@ -183,7 +186,8 @@ public class MenuPanel extends JPanel {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				_cardLayout.show(_cardPanel, cardName);
-				SoundWorker.playSound("pop.wav");
+				_originFrame.singer = new SoundWorker("boot.wav");
+				_originFrame.singer.execute();
 			}
 		});
 	}

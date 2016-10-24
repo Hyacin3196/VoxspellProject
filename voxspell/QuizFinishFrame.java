@@ -27,7 +27,9 @@ import java.awt.Font;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-
+/**
+ * @author jdum654
+ */
 public class QuizFinishFrame extends JFrame {
 
 	private CardLayout _cardLayout;
@@ -96,7 +98,8 @@ public class QuizFinishFrame extends JFrame {
 		btnRedoQuiz.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
 				_originFrame._spellingQuiz.startQuiz();
-				SoundWorker.playSound("pop.wav");
+				_originFrame.singer = new SoundWorker("boot.wav");
+				_originFrame.singer.execute();
 				QuizFinishFrame.this.dispatchEvent(new WindowEvent(QuizFinishFrame.this, WindowEvent.WINDOW_CLOSING));
 				_originFrame.setEnabled(true);
 			}
@@ -132,7 +135,8 @@ public class QuizFinishFrame extends JFrame {
 				_originFrame.setEnabled(true);
 				_cardLayout.show(_cardPanel, "Menu");
 
-				SoundWorker.playSound("pop.wav");
+				_originFrame.singer = new SoundWorker("boot.wav");
+				_originFrame.singer.execute();
 			}
 		});
 		
