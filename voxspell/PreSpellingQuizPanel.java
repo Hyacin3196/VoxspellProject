@@ -54,7 +54,7 @@ public class PreSpellingQuizPanel extends JPanel {
 	private JLabel lblNumberOfWords;
 	private JLabel lblVoice;
 	private JComboBox voiceComboBox;
-	private JButton btnContinue;
+	private JButton btnStart;
 	private JButton btnBack;
 	private JSlider sliderQuizSize;
 	private JTextField quizSizeTextField;
@@ -226,8 +226,8 @@ public class PreSpellingQuizPanel extends JPanel {
 		});
 		
 		//initialise "continue" button
-		btnContinue = new JButton("Continue");
-		btnContinue.addActionListener(new ActionListener(){
+		btnStart = new JButton("Start");
+		btnStart.addActionListener(new ActionListener(){
 			public void actionPerformed(ActionEvent arg0) {
 				try{
 					int x = Integer.parseInt(quizSizeTextField.getText());
@@ -252,7 +252,7 @@ public class PreSpellingQuizPanel extends JPanel {
 		gbc_btnContinue.insets = new Insets(0, 0, 0, 5);
 		gbc_btnContinue.gridx = 3;
 		gbc_btnContinue.gridy = 5;
-		this.add(btnContinue, gbc_btnContinue);
+		this.add(btnStart, gbc_btnContinue);
 
 		//initialise "back to menu" button
 		btnBack = new JButton("Back");
