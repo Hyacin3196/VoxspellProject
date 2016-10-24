@@ -36,7 +36,7 @@ public class VoxspellFrame extends JFrame {
 	 */
 	public ThemePreview[] getThemeListAsPreview(){
 		List<ThemePreview> previews = new ArrayList<ThemePreview>();
-		_themeList.forEach(theme -> {
+		for(List<Color> theme:_themeList){
 			Color c1 = theme.get(0);
 			Color c2 = theme.get(1);
 
@@ -57,7 +57,7 @@ public class VoxspellFrame extends JFrame {
 
 			ThemePreview preview = new ThemePreview(image, theme);
 			previews.add(preview);
-		});
+		}
 		return previews.toArray(new ThemePreview[1]);
 	}
 
